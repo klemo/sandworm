@@ -3,16 +3,25 @@
   <li class="active">{{labDetailsCtrl.lab.name}}</li>
 </ol>
 
-<h1>{{labDetailsCtrl.lab.name}}</h1>
-
-<p>Početak: {{labDetailsCtrl.lab.start}}</p>
-<p>Kraj: {{labDetailsCtrl.lab.end}}</p>
-<p class="lead">{{labDetailsCtrl.lab.desc}}</p>
-<div>
-  <button type="button" class="btn btn-default">Dohvati rješenje</button>
+<div class="page-header">
+  <h1>{{labDetailsCtrl.lab.name}}</h1>
 </div>
 
-<h2>Rezultati izvođenja testova</h2>
+<div class="row">
+  <div class="col-md-12">
+    <p class="lead">{{labDetailsCtrl.lab.desc}}</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-10">
+    Početak: <span class="label label-success">{{labDetailsCtrl.lab.start}}</span>
+    Kraj: <span class="label label-danger">{{labDetailsCtrl.lab.end}}</span>
+  </div>
+  <div class="col-md-2">
+    <button type="button" class="btn btn-default">Dohvati rješenje</button>
+  </div>
+</div>
 
 <div class="row" ng-repeat="test in labDetailsCtrl.lab.results.tests">
   <h3>{{test.name}}</h3>
@@ -22,7 +31,7 @@
       <th>Detalji</th>
       <th>Rezultat</th>
     </tr>
-    <tr ng-repeat="subTest in test.subTests">
+    <tr ng-repeat="subTest in test.subTests" ng-class="{'danger': !subTest.passed}">
       <td>{{subTest.name}}</td>
       <td>{{subTest.details}}</td>
       <td>
