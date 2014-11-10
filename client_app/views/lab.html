@@ -3,46 +3,48 @@
   <li class="active">{{labDetailsCtrl.lab.name}}</li>
 </ol>
 
-<div class="page-header">
-  <h1>{{labDetailsCtrl.lab.name}}</h1>
-</div>
+<div class="single-lab">
 
-<div class="row">
-  <div class="col-md-12">
-    <p class="lead">{{labDetailsCtrl.lab.desc}}</p>
+  <div class="page-header name">
+    <h1>{{labDetailsCtrl.lab.name}}</h1>
   </div>
-</div>
 
-<div class="row">
-  <div class="col-md-10">
-    Početak: <span ng-class="{'label label-danger': labDetailsCtrl.lab.isOver,
-                                       'label label-success': !labDetailsCtrl.lab.isOver}">{{labDetailsCtrl.lab.start | date:'dd. MM. yyyy HH:mm:ss'}}</span>
-    Kraj: <span ng-class="{'label label-danger': labDetailsCtrl.lab.isOver,
-                                       'label label-success': !labDetailsCtrl.lab.isOver}">{{labDetailsCtrl.lab.end | date:'dd. MM. yyyy HH:mm:ss'}}</span>
-  </div>
-  <div class="col-md-2">
-    <button type="button" class="btn btn-primary" ng-hide="labDetailsCtrl.lab.isOver">Predaj rješenje</button>
-    <button type="button" class="btn btn-default" ng-show="labDetailsCtrl.lab.isOver">Dohvati rješenje</button>
-  </div>
-</div>
+  <p class="lead description">{{labDetailsCtrl.lab.desc}}</p>
 
-<div class="row" ng-repeat="test in labDetailsCtrl.lab.results.tests">
-  <h3>{{test.name}}</h3>
-  <table class="table">
-    <tr>
-      <th>Podtest</th>
-      <th>Detalji</th>
-      <th>Rezultat</th>
-    </tr>
-    <tr ng-repeat="subTest in test.subTests" ng-class="{'danger': !subTest.passed}">
-      <td>{{subTest.name}}</td>
-      <td>{{subTest.details}}</td>
-      <td>
-        <span ng-show="{{subTest.passed}}"
-              class="glyphicon glyphicon-ok"></span>
-        <span ng-show="{{!subTest.passed}}"
-              class="glyphicon glyphicon-remove"></span>
-      </td>
-    </tr>
-  </table>
+  <div class="row">
+    <div class="col-md-8">
+      Kraj: <span ng-class="{'label label-danger': labDetailsCtrl.lab.isOver,
+                            'label label-success': !labDetailsCtrl.lab.isOver}">{{labDetailsCtrl.lab.end | date:'dd. MM. yyyy HH:mm:ss'}}</span>
+    </div>
+    <div class="col-md-4">
+      <button type="button" class="btn btn-primary" ng-show="!labDetailsCtrl.lab.isOver">Predaj rješenje</button>
+      <button type="button" class="btn btn-default" ng-show="labDetailsCtrl.lab.submitted">Dohvati rješenje</button>
+    </div>
+  </div>
+
+  <div ng-if="labDetailsCtrl.lab.results" class="score alert alert-info" role="alert">
+    Rezultat: {{labDetailsCtrl.lab.results.score}} od {{labDetailsCtrl.lab.results.scoreTotal}}
+    ({{labDetailsCtrl.lab.results.score/labDetailsCtrl.lab.results.scoreTotal*100 | number: 2}}%)
+  </div>
+
+  <div class="row results" ng-repeat="test in labDetailsCtrl.lab.results.tests">
+    <h3>{{test.name}}</h3>
+    <table class="table">
+      <tr>
+        <th>Podtest</th>
+        <th>Detalji</th>
+        <th>Rezultat</th>
+      </tr>
+      <tr ng-repeat="subTest in test.subTests" ng-class="{'danger': !subTest.passed}">
+        <td>{{subTest.name}}</td>
+        <td>{{subTest.details}}</td>
+        <td>
+          <span ng-show="{{subTest.passed}}"
+                class="glyphicon glyphicon-ok"></span>
+          <span ng-show="{{!subTest.passed}}"
+                class="glyphicon glyphicon-remove"></span>
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
