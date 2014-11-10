@@ -13,10 +13,9 @@ var sandworm = angular.module('sandworm', [
     var self = this;
     self.labs = LabService.query();
 }])
-.controller('LabDetailsCtrl', ['LabService', function(LabService) {
+    .controller('LabDetailsCtrl', ['$routeParams', 'LabService', function($routeParams, LabService) {
     var self = this;
-    self.lab = {'name':'test'};
-    //LabService.get({labId: $routeParams.labId});
+    self.lab = LabService.get({labId: $routeParams.labId});
 }])
 .config(function($routeProvider) {
     $routeProvider.when('/labs', {

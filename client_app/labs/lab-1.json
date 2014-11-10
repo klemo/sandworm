@@ -1,7 +1,33 @@
 {
-    "title": "LAB1", 
+    "name": "LAB1", 
     "id": "lab-1", 
     "desc": "short description",
-    "beginning": "2015-10-21T13:28:06.419Z",
-    "end": "2015-10-21T13:28:06.419Z"
+    "start": "2015-10-21T13:28:06.419Z",
+    "end": "2015-10-21T13:28:06.419Z",
+    "results": {
+        "score": 30,
+        "scoreTotal": 30,
+        "tests": [
+            {"name": "test1",
+             "subTests": [
+                 {"name": "st1",
+                  "details": "some details",
+                  "passed": true}
+                ]
+            },
+            {"name": "test2",
+             "subTests": [
+                 {"name": "st1",
+                  "details": "some details",
+                  "passed": true},
+                 {"name": "st2",
+                  "details": "some details",
+                  "passed": false},
+                 {"name": "st3",
+                  "details": "some details",
+                  "passed": true}
+                ]
+            }
+        ]
+    }
 }

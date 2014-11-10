@@ -1,3 +1,36 @@
+<ol class="breadcrumb">
+  <li><a href="#/labs">Labs</a></li>
+  <li class="active">{{labDetailsCtrl.lab.name}}</li>
+</ol>
+
 <h1>{{labDetailsCtrl.lab.name}}</h1>
 
+<p>Početak: {{labDetailsCtrl.lab.start}}</p>
+<p>Kraj: {{labDetailsCtrl.lab.end}}</p>
+<p class="lead">{{labDetailsCtrl.lab.desc}}</p>
+<div>
+  <button type="button" class="btn btn-default">Dohvati rješenje</button>
+</div>
+
 <h2>Rezultati izvođenja testova</h2>
+
+<div class="row" ng-repeat="test in labDetailsCtrl.lab.results.tests">
+  <h3>{{test.name}}</h3>
+  <table class="table">
+    <tr>
+      <th>Podtest</th>
+      <th>Detalji</th>
+      <th>Rezultat</th>
+    </tr>
+    <tr ng-repeat="subTest in test.subTests">
+      <td>{{subTest.name}}</td>
+      <td>{{subTest.details}}</td>
+      <td>
+        <span ng-show="{{subTest.passed}}"
+              class="glyphicon glyphicon-ok"></span>
+        <span ng-show="{{!subTest.passed}}"
+              class="glyphicon glyphicon-remove"></span>
+      </td>
+    </tr>
+  </table>
+</div>
