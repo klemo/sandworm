@@ -1,7 +1,10 @@
-<div class="row">
-  <ul class="list-group">
-    <li class="list-group-item" ng-repeat="lab in labCtrl.labs">
-      {{lab.title}}
-    </li>
-  </ul>
+<div class="row" ng-repeat="lab in labCtrl.labs">
+  <h2>
+    <a href="#/labs/{{lab.id}}">{{lab.title}}</a>
+  </h2>
+  <p>{{lab.desc}}</p>
+  <p>Rok za predaju: {{lab.end}}</p>
+  <div>
+    <button type="button" class="btn btn-primary">Predaja</button>
+  </div>
 </div>

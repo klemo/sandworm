@@ -2,16 +2,22 @@
     {
         "title": "LAB1", 
         "id": "lab-1", 
-        "desc": "short description"
+        "desc": "short description",
+        "beginning": "2015-10-21T13:28:06.419Z",
+        "end": "2015-10-21T13:28:06.419Z"
     },
     {
         "title": "LAB2", 
         "id": "lab-2", 
-        "desc": "short description"
+        "desc": "short description",
+        "beginning": "2015-10-21T13:28:06.419Z",
+        "end": "2015-10-21T13:28:06.419Z"
     },
     {
         "title": "LAB3", 
         "id": "lab-3", 
-        "desc": "short description"
+        "desc": "short description",
+        "beginning": "2015-10-21T13:28:06.419Z",
+        "end": "2015-10-21T13:28:06.419Z"
     }
 ]

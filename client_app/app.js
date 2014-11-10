@@ -13,12 +13,20 @@ var sandworm = angular.module('sandworm', [
     var self = this;
     self.labs = LabService.query();
 }])
+.controller('LabDetailsCtrl', ['LabService', function(LabService) {
+    var self = this;
+    self.lab = {'name':'test'};
+    //LabService.get({labId: $routeParams.labId});
+}])
 .config(function($routeProvider) {
-    $routeProvider.when('/', {
+    $routeProvider.when('/labs', {
         templateUrl: 'views/labs.html',
         controller: 'LabCtrl as labCtrl'
+    }).when('/labs/:labId', {
+        templateUrl: 'views/lab.html',
+        controller: 'LabDetailsCtrl as labDetailsCtrl'
     });
     $routeProvider.otherwise({
-        redirectTo: '/'
+        redirectTo: '/labs'
     });
 });
