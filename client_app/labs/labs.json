@@ -1,0 +1,17 @@
+[
+    {
+        "title": "LAB1", 
+        "id": "lab-1", 
+        "desc": "short description"
+    },
+    {
+        "title": "LAB2", 
+        "id": "lab-2", 
+        "desc": "short description"
+    },
+    {
+        "title": "LAB3", 
+        "id": "lab-3", 
+        "desc": "short description"
+    }
+]
