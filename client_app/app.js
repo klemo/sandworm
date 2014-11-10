@@ -3,7 +3,7 @@ var sandworm = angular.module('sandworm', [
     'ngResource',
 ])
 .factory('LabService', ['$resource', function($resource){
-    return $resource('labs/:labId.json', {}, {
+    return $resource('api/labs/:labId.json', {}, {
         query: {method: 'GET',
                 params: {labId: 'labs'},
                 isArray: true}
