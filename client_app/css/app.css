@@ -1,0 +1,10 @@
+/* app css stylesheet */
+
+.main-content {
+    margin-top: 80px;
+}
+
+.lab.row {
+    padding-bottom: 30px;
+    border-bottom: 1px solid #dddddd;
+}

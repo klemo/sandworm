@@ -11,11 +11,18 @@ var sandworm = angular.module('sandworm', [
 }])
 .controller('LabCtrl', ['LabService', function(LabService) {
     var self = this;
-    self.labs = LabService.query();
+    var now = Date.now();
+    self.labs = LabService.query(function(labs) {
+        labs = angular.forEach(labs, function(lab) {
+            lab.isOver = lab.end < now;
+        });
+    });
 }])
-    .controller('LabDetailsCtrl', ['$routeParams', 'LabService', function($routeParams, LabService) {
+.controller('LabDetailsCtrl', ['$routeParams', 'LabService', function($routeParams, LabService) {
     var self = this;
-    self.lab = LabService.get({labId: $routeParams.labId});
+    self.lab = LabService.get({labId: $routeParams.labId}, function(lab) {
+        lab.isOver = lab.end < Date.now();
+    });
 }])
 .config(function($routeProvider) {
     $routeProvider.when('/labs', {

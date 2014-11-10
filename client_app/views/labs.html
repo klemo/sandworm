@@ -1,10 +1,15 @@
-<div class="row" ng-repeat="lab in labCtrl.labs">
+<div class="lab row" ng-repeat="lab in labCtrl.labs">
   <h2>
     <a href="#/labs/{{lab.id}}">{{lab.name}}</a>
   </h2>
   <p>{{lab.desc}}</p>
-  <p>Rok za predaju: <span class="label label-danger">{{lab.end}}</span></p>
-  <div>
-    <button type="button" class="btn btn-primary">Predaja</button>
+  <div class="row">
+    <div class="col-md-10">
+      Rok za predaju: <span ng-class="{'label label-danger': lab.isOver,
+                                       'label label-success': !lab.isOver}">{{lab.end | date:'dd. MM. yyyy HH:mm:ss'}}</span>
+    </div>
+    <div class="col-md-2">
+      <button type="button" class="btn btn-primary" ng-hide="lab.isOver">Predaj rješenje</button>
+    </div>
   </div>
 </div>
