@@ -1,33 +1,35 @@
 <ol class="breadcrumb">
   <li><a href="#/labs">Labs</a></li>
-  <li class="active">{{labDetailsCtrl.lab.name}}</li>
+  <li class="active">{{ctrl.lab.name}}</li>
 </ol>
 
 <div class="single-lab">
 
   <div class="page-header name">
-    <h1>{{labDetailsCtrl.lab.name}}</h1>
+    <h1>{{ctrl.lab.name}}</h1>
   </div>
 
-  <p class="lead description">{{labDetailsCtrl.lab.desc}}</p>
+  <p class="lead description">{{ctrl.lab.desc}}</p>
 
   <div class="row">
     <div class="col-md-8">
-      Kraj: <span ng-class="{'label label-danger': labDetailsCtrl.lab.isOver,
-                            'label label-success': !labDetailsCtrl.lab.isOver}">{{labDetailsCtrl.lab.end | date:'dd. MM. yyyy HH:mm:ss'}}</span>
+      Kraj: <span ng-class="{'label label-danger': ctrl.lab.isOver,
+                            'label label-success': !ctrl.lab.isOver}">{{ctrl.lab.end | date:'dd. MM. yyyy HH:mm:ss'}}</span>
     </div>
     <div class="col-md-4">
-      <button type="button" class="btn btn-primary" ng-show="!labDetailsCtrl.lab.isOver">Predaj rješenje</button>
-      <button type="button" class="btn btn-default" ng-show="labDetailsCtrl.lab.submitted">Dohvati rješenje</button>
+      <button type="button" class="btn btn-primary" ng-show="!ctrl.lab.isOver">Predaj rješenje</button>
+      <button type="button" class="btn btn-default" ng-show="ctrl.lab.submitted">Dohvati rješenje</button>
     </div>
   </div>
 
-  <div ng-if="labDetailsCtrl.lab.results" class="score alert alert-info" role="alert">
-    Rezultat: {{labDetailsCtrl.lab.results.score}} od {{labDetailsCtrl.lab.results.scoreTotal}}
-    ({{labDetailsCtrl.lab.results.score/labDetailsCtrl.lab.results.scoreTotal*100 | number: 2}}%)
+  <div ng-if="ctrl.lab.results" class="score">
+    <p class="alert alert-info" role="alert">
+      Rezultat: {{ctrl.lab.results.score}} od {{ctrl.lab.results.scoreTotal}}
+      ({{ctrl.lab.results.score/ctrl.lab.results.scoreTotal*100 | number: 2}}%)
+    </p>
   </div>
 
-  <div class="row results" ng-repeat="test in labDetailsCtrl.lab.results.tests">
+  <div class="row results" ng-repeat="test in ctrl.lab.results.tests">
     <h3>{{test.name}}</h3>
     <table class="table">
       <tr>
