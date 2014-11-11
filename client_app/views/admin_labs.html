@@ -1,0 +1,20 @@
+<ol class="breadcrumb">
+  <li><a href="#/admin/">Admin</a></li>
+  <li><a href="#/admin/labs">Labs</a></li>
+</ol>
+
+<div class="lab row" ng-repeat="lab in labCtrl.labs">
+  <h2>
+    <a href="#/admin/labs/{{lab.id}}">{{lab.name}}</a>
+  </h2>
+  <p>{{lab.desc}}</p>
+  <div class="row">
+    <div class="col-md-12">
+      Rok za predaju: <span ng-class="{'label label-danger': lab.isOver,
+                                       'label label-success': !lab.isOver}">{{lab.end | date:'dd. MM. yyyy HH:mm:ss'}}</span>
+      <span ng-show="lab.published" class="label label-success">Rezultati SU OBJAVLJENI studentima</span>
+      <span ng-show="!lab.published" class="label label-danger">Rezultati NISU OBJAVLJENI studentima</span>
+      
+    </div>
+  </div>
+</div>

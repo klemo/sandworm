@@ -31,6 +31,14 @@ var sandworm = angular.module('sandworm', [
     }).when('/labs/:labId', {
         templateUrl: 'views/lab.html',
         controller: 'LabDetailsCtrl as ctrl'
+    }).when('/admin', {
+        redirectTo: '/admin/labs'
+    }).when('/admin/labs', {
+        templateUrl: 'views/admin_labs.html',
+        controller: 'LabCtrl as labCtrl'
+    }).when('/admin/labs/:labId', {
+        templateUrl: 'views/admin_lab.html',
+        controller: 'LabDetailsCtrl as ctrl'
     });
     $routeProvider.otherwise({
         redirectTo: '/labs'
