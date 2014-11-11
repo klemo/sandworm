@@ -1,6 +1,6 @@
 var sandworm = angular.module('sandworm', [
-    'ngRoute',
-    'ngResource',
+    'ui.router',
+    'ngResource'
 ])
 .factory('LabService', ['$resource', function($resource){
     return $resource('api/labs/:labId.json', {}, {
@@ -18,29 +18,46 @@ var sandworm = angular.module('sandworm', [
         });
     });
 }])
-.controller('LabDetailsCtrl', ['$routeParams', 'LabService', function($routeParams, LabService) {
+.controller('LabDetailsCtrl', ['$stateParams', 'LabService', function($stateParams, LabService) {
     var self = this;
-    self.lab = LabService.get({labId: $routeParams.labId}, function(lab) {
+    self.lab = LabService.get({labId: $stateParams.labId}, function(lab) {
         lab.isOver = lab.end < Date.now();
     });
 }])
-.config(function($routeProvider) {
-    $routeProvider.when('/labs', {
-        templateUrl: 'views/labs.html',
-        controller: 'LabCtrl as labCtrl'
-    }).when('/labs/:labId', {
-        templateUrl: 'views/lab.html',
-        controller: 'LabDetailsCtrl as ctrl'
-    }).when('/admin', {
-        redirectTo: '/admin/labs'
-    }).when('/admin/labs', {
-        templateUrl: 'views/admin_labs.html',
-        controller: 'LabCtrl as labCtrl'
-    }).when('/admin/labs/:labId', {
-        templateUrl: 'views/admin_lab.html',
-        controller: 'LabDetailsCtrl as ctrl'
+.config(function($stateProvider, $urlRouterProvider) {
+    $stateProvider.state('labs', {
+        url: '/labs',
+        views: {
+            'uir-view-nav': { templateUrl: 'views/nav.html' },
+            'uir-view-content': {
+                templateUrl: 'views/labs.html',
+                controller: 'LabCtrl as labCtrl'}
+        }        
+    }).state('lab', {
+        url: '/labs/:labId',
+        views: {
+            'uir-view-nav': { templateUrl: 'views/nav.html' },
+            'uir-view-content': {
+                templateUrl: 'views/lab.html',
+                controller: 'LabDetailsCtrl as ctrl'}
+        }        
+    }).state('admin-labs', {
+        url: '/admin/labs',
+        views: {
+            'uir-view-nav': { templateUrl: 'views/admin_nav.html' },
+            'uir-view-content': {
+                templateUrl: 'views/admin_labs.html',
+                controller: 'LabCtrl as labCtrl'}
+        }        
+    }).state('admin-lab', {
+        url: '/admin/labs/:labId',
+        views: {
+            'uir-view-nav': { templateUrl: 'views/admin_nav.html' },
+            'uir-view-content': {
+                templateUrl: 'views/admin_lab.html',
+                controller: 'LabDetailsCtrl as ctrl'}
+        }        
     });
-    $routeProvider.otherwise({
-        redirectTo: '/labs'
-    });
+    $urlRouterProvider.otherwise('/labs');
+    $urlRouterProvider.when('/admin', '/admin/labs');
 });
