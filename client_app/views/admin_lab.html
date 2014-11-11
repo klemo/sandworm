@@ -18,9 +18,18 @@
                             'label label-success': !ctrl.lab.isOver}">{{ctrl.lab.end | date:'dd. MM. yyyy HH:mm:ss'}}</span>
       <span ng-show="lab.published" class="label label-success">Rezultati SU OBJAVLJENI studentima</span>
       <span ng-show="!lab.published" class="label label-danger">Rezultati NISU OBJAVLJENI studentima</span>
+      <button ng-show="lab.published" type="button" class="btn btn-default btn-xs">Sakrij rezultate</button>
+      <button ng-show="!lab.published" type="button" class="btn btn-default btn-xs">Objavi rezultate</button>
     </div>
     <div class="col-md-4">
-      <button type="button" class="btn btn-primary pull-right" ng-show="!ctrl.lab.isOver">Uredi</button>
+      <button type="button" class="btn btn-primary pull-right">Uredi</button>
     </div>
   </div>
+
+  <div class="row">
+    <button type="button" class="btn btn-default">Pokreni testove</button>
+    <button type="button" class="btn btn-default">Rezultati</button>
+    <button type="button" class="btn btn-default">...</button>
+  </div>
+  
 </div>
