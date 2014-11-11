@@ -17,6 +17,15 @@ var sandworm = angular.module('sandworm', [
             lab.isOver = lab.end < now;
         });
     });
+    self.lab = {
+        name: '',
+        desc: '',
+        start: new Date(),
+        end: new Date()
+    };
+    self.submit = function() {
+        console.log('Submit with ', self.lab);
+    };
 }])
 .controller('LabDetailsCtrl', ['$stateParams', 'LabService', function($stateParams, LabService) {
     var self = this;
