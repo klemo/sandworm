@@ -9,6 +9,13 @@ var sandworm = angular.module('sandworm', [
                 isArray: true}
     });
 }])
+.factory('LabResultsService', ['$resource', function($resource){
+    return $resource('api/labs/:labId/results.json', {}, {
+        query: {method: 'GET',
+                params: {labId: 'labs'},
+                isArray: true}
+    });
+}])
 .controller('LabCtrl', ['LabService', function(LabService) {
     var self = this;
     var now = Date.now();
@@ -32,6 +39,10 @@ var sandworm = angular.module('sandworm', [
     self.lab = LabService.get({labId: $stateParams.labId}, function(lab) {
         lab.isOver = lab.end < Date.now();
     });
+}])
+.controller('LabResultsCtrl', ['$stateParams', 'LabResultsService', function($stateParams, LabResultsService) {
+    var self = this;
+    self.lab = LabResultsService.get({labId: $stateParams.labId}, function(lab) {});
 }])
 .config(function($stateProvider, $urlRouterProvider) {
     $stateProvider.state('labs', {
@@ -65,6 +76,14 @@ var sandworm = angular.module('sandworm', [
             'uir-view-content': {
                 templateUrl: 'views/admin_lab.html',
                 controller: 'LabDetailsCtrl as ctrl'}
+        }        
+    }).state('admin-lab-results', {
+        url: '/admin/labs/:labId/results',
+        views: {
+            'uir-view-nav': { templateUrl: 'views/admin_nav.html' },
+            'uir-view-content': {
+                templateUrl: 'views/admin_lab_results.html',
+                controller: 'LabResultsCtrl as ctrl'}
         }        
     });
     $urlRouterProvider.otherwise('/labs');

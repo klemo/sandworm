@@ -1,0 +1,34 @@
+<ol class="breadcrumb">
+  <li><a href="#/admin/labs">Admin</a></li>
+  <li><a href="#/admin/labs">Labs</a></li>
+  <li><a href="#/admin/labs/{{ctrl.lab.id}}">{{ctrl.lab.name}}</a></li>
+  <li class="active">Rezultati</li>
+</ol>
+
+<div class="page-header name">
+  <h1>{{ctrl.lab.name}}</h1>
+</div>
+
+<div class="row">
+  <p>Broj studenata: {{ctrl.lab.numOfStudents}}</p>
+  <p>Broj predanih rješenja: {{ctrl.lab.numOfSolutions}}</p>
+</div>
+
+<div class="row results">
+  <table class="table">
+    <tr>
+      <th>Korisničko ime</th>
+      <th>Ime i prezime</th>
+      <th>JMBAG</th>
+      <th>Jezik</th>
+      <th>Rezultat</th>
+    </tr>
+    <tr ng-repeat="user in ctrl.lab.results" ng-class="{'danger': !user.score}">
+      <td>{{user.username}}</td>
+      <td>{{user.name}}</td>
+      <td>{{user.id}}</td>
+      <td>{{user.lang}}</td>
+      <td>{{user.score}}</td>
+    </tr>
+  </table>
+</div>
