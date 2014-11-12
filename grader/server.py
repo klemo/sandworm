@@ -18,6 +18,7 @@ import pymongo
 import simplejson as json
 import urllib
 import settings
+import utils
 
 #------------------------------------------------------------------------------
 
@@ -32,7 +33,7 @@ class Application(tornado.web.Application):
             (r'/', MainHandler),
             (r'/api/v1/labs$', LabHandler),
             (r'/api/v1/labs/(.+)', LabHandler),
-            # (r'/login', LoginHandler),
+            (r'/login', LoginHandler),
             # (r'/logout', LogoutHandler)
             ]
         env = dict(
@@ -41,8 +42,7 @@ class Application(tornado.web.Application):
             static_path=os.path.join(
                 os.path.dirname(__file__), 'static'),
             debug=settings.ENV['debug'],
-            cookie_secret=settings.COOKIE_SECRET,
-            xsrf_cookies=True,
+            xsrf_cookies=False,
             login_url='/login')
         #self.mongo = utils.connect_to_mongo(settings.ENV)
         tornado.web.Application.__init__(self, handlers, **env)
@@ -52,29 +52,24 @@ class Application(tornado.web.Application):
 class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
-        return self.get_secure_cookie('password')
+        auth = utils.authenticate(self)
+        if auth.get('error'):
+            self.set_status(401)
+        self.write(json.dumps(auth))
 
 #------------------------------------------------------------------------------
     
 class LoginHandler(BaseHandler):
 
-    def get(self):
-        self.render('login.html')
-
     def post(self):
-        pswd = self.get_argument('password', '')
-        if pswd == 'metatest':
-            self.set_secure_cookie('password', 'true')
-            self.redirect('/')
-        else:
-            self.redirect('/login')
+        user = json.loads(self.request.body)
+        self.write(json.dumps(utils.login(user)))
 
 #------------------------------------------------------------------------------
         
 class LogoutHandler(BaseHandler):
 
     def get(self):
-        self.clear_cookie('password')
         self.redirect('/')
 
 #------------------------------------------------------------------------------
@@ -82,6 +77,9 @@ class LogoutHandler(BaseHandler):
 class MainHandler(BaseHandler):
 
     def get(self):
+        self.render('index.html')
+
+    def post(self):
         self.render('index.html')
 
 #------------------------------------------------------------------------------
