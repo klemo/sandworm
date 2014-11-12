@@ -14,16 +14,14 @@ import tornado.escape
 from tornado.options import define, options
 # application imports
 import os.path
-import functools
-import urllib
-import settings
 import pymongo
 import simplejson as json
+import urllib
+import settings
 
 #------------------------------------------------------------------------------
 
 define('env', default='local', help='running env (settings.ENV)', type=str)
-define('live', default=False, help='run on the live database', type=bool)
 
 #------------------------------------------------------------------------------
 

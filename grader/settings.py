@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-COOKIE_SECRET = 'kauoXgh-SEaRbpSkAChpw18AIqXR1EAZhWuv9Y7i07E='
+COOKIE_SECRET = ''
 
 #------------------------------------------------------------------------------
 
