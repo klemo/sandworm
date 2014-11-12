@@ -1,0 +1,4 @@
+requests
+simplejson
+tornado
+pymongo
