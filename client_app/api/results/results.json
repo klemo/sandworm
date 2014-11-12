@@ -1,8 +1,11 @@
 {
-    "labInfo": [
-        {"name": "LAB1", "avgScore": "100.00%"},
-        {"name": "LAB2", "avgScore": "90.20%"}
-    ],
+    "labInfo": {
+        "labs": [
+            {"name": "LAB1", "id": "lab-1", "avgScore": "100.00%"},
+            {"name": "LAB2", "id": "lab-2", "avgScore": "90.20%"}
+        ],
+        "avgTotal": 2.75
+    },
     "labs": [
         {"username": "test1",
          "name": "ivo ivic",

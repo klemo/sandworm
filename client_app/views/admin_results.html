@@ -4,12 +4,19 @@
 </ol>
 
 <div class="row results">
-  <table class="table">
+  <table class="table table-hover">
     <tr>
       <th>Ime i prezime</th>
       <th>JMBAG</th>
-      <th ng-repeat="lab in ctrl.results.labInfo">{{lab.name}}</th>
+      <th ng-repeat="lab in ctrl.results.labInfo.labs">
+        <a href="#/admin/labs/{{lab.id}}">{{lab.name}}</a>
+      </th>
       <th>Bodovi</th>
+    </tr>
+    <tr class="info">
+      <th colspan="2">Prosjek</th>
+      <th ng-repeat="lab in ctrl.results.labInfo.labs">{{lab.avgScore}}</th>
+      <th>{{ctrl.results.labInfo.avgTotal}}</th>
     </tr>
     <tr ng-repeat="lab in ctrl.results.labs">
       <td>{{lab.name}}</td>
