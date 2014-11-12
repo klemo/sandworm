@@ -28,7 +28,34 @@
 
   <div class="row">
     <button type="button" class="btn btn-default">Pokreni testove</button>
-    <a href="#/admin/labs/{{ctrl.lab.id}}/results" class="btn btn-default">Rezultati</a>
   </div>
   
+</div>
+
+<div class="page-header name">
+    <h1>Rezultati izvođenja testova</h1>
+  </div>
+
+<div class="row">
+  <p>Broj studenata: {{ctrl.lab.numOfStudents}}</p>
+  <p>Broj predanih rješenja: {{ctrl.lab.numOfSolutions}}</p>
+</div>
+
+<div class="row results">
+  <table class="table table-hover">
+    <tr>
+      <th>Korisničko ime</th>
+      <th>Ime i prezime</th>
+      <th>JMBAG</th>
+      <th>Jezik</th>
+      <th>Rezultat</th>
+    </tr>
+    <tr ng-repeat="user in ctrl.lab.results" ng-class="{'danger': !user.score}">
+      <td>{{user.username}}</td>
+      <td>{{user.name}}</td>
+      <td>{{user.id}}</td>
+      <td>{{user.lang}}</td>
+      <td>{{user.score}}</td>
+    </tr>
+  </table>
 </div>

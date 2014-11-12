@@ -57,8 +57,8 @@ var sandworm = angular.module('sandworm', [
         lab.isOver = lab.end < Date.now();
     });
 }])
-/** LabResultsCtrl @description displays results for given lab */
-.controller('LabResultsCtrl', ['$stateParams', 'LabResultsService', function($stateParams, LabResultsService) {
+/** LabResultsCtrl @description displays lab details for admin */
+.controller('AdminLabDetailsCtrl', ['$stateParams', 'LabResultsService', function($stateParams, LabResultsService) {
     var self = this;
     self.lab = LabResultsService.get({labId: $stateParams.labId}, function(lab) {});
 }])
@@ -100,15 +100,7 @@ var sandworm = angular.module('sandworm', [
             'uir-view-nav': { templateUrl: 'views/admin_nav.html' },
             'uir-view-content': {
                 templateUrl: 'views/admin_lab.html',
-                controller: 'LabDetailsCtrl as ctrl'}
-        }
-    }).state('admin-lab-results', {
-        url: '/admin/labs/:labId/results',
-        views: {
-            'uir-view-nav': { templateUrl: 'views/admin_nav.html' },
-            'uir-view-content': {
-                templateUrl: 'views/admin_lab_results.html',
-                controller: 'LabResultsCtrl as ctrl'}
+                controller: 'AdminLabDetailsCtrl as ctrl'}
         }
     }).state('admin-results', {
         url: '/admin/results',
