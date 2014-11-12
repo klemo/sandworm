@@ -9,11 +9,13 @@
       <th>Ime i prezime</th>
       <th>JMBAG</th>
       <th ng-repeat="lab in ctrl.results.labInfo">{{lab.name}}</th>
+      <th>Bodovi</th>
     </tr>
     <tr ng-repeat="lab in ctrl.results.labs">
       <td>{{lab.name}}</td>
       <td>{{lab.id}}</td>
       <td ng-repeat="score in lab.scores track by $index" ng-class="{'danger': !score}">{{score}}</td>
+      <td>{{lab.total}}</td>
     </tr>
   </table>
 </div>

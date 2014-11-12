@@ -1,0 +1,27 @@
+{
+    "labInfo": [
+        {"name": "LAB1", "avgScore": "100.00%"},
+        {"name": "LAB2", "avgScore": "90.20%"}
+    ],
+    "labs": [
+        {"username": "test1",
+         "name": "ivo ivic",
+         "id": "00001",
+         "total": 3.5,
+         "scores": ["100%", "90%"]},
+        {"username": "test2",
+         "name": "ana anic",
+         "id": "00002",
+         "total": 3.5,
+         "scores": [null, "90%"]},
+        {"username": "test3",
+         "name": "jure juric",
+         "id": "00003",
+         "scores": ["100%", "90%"]},
+        {"username": "test4",
+         "name": "mate matic",
+         "id": "00004",
+         "total": 0,
+         "scores": [null, null]}
+    ]
+}
