@@ -1,0 +1,19 @@
+<ol class="breadcrumb">
+  <li><a href="#/admin">Admin</a></li>
+  <li class="active">Bodovi</li>
+</ol>
+
+<div class="row results">
+  <table class="table">
+    <tr>
+      <th>Ime i prezime</th>
+      <th>JMBAG</th>
+      <th ng-repeat="lab in ctrl.results.labInfo">{{lab.name}}</th>
+    </tr>
+    <tr ng-repeat="lab in ctrl.results.labs">
+      <td>{{lab.name}}</td>
+      <td>{{lab.id}}</td>
+      <td ng-repeat="score in lab.scores track by $index" ng-class="{'danger': !score}">{{score}}</td>
+    </tr>
+  </table>
+</div>
