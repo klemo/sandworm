@@ -99,6 +99,7 @@ class UserHandler(BaseHandler):
 class MainHandler(BaseHandler):
 
     def get(self):
+        self.xsrf_token
         self.render('index.html')
 
 #------------------------------------------------------------------------------
