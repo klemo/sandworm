@@ -63,8 +63,13 @@ class LoginHandler(BaseHandler):
 
     def post(self):
         user = json.loads(self.request.body)
-        self.set_secure_cookie('username', user['username'])
-        self.write(json.dumps({'username': user['username']}))
+        # devel only, obviously...
+        if user['password'] == 'test':
+            self.set_secure_cookie('username', user['username'])
+            self.write(json.dumps({'username': user['username']}))
+        else:
+            self.set_status(401)
+            self.write(json.dumps({'msg': 'username/password error'}))
 
 #------------------------------------------------------------------------------
 

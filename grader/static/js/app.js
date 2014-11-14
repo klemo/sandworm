@@ -56,7 +56,6 @@ var sandworm = angular.module('sandworm', [
                 .then(function(response) {
                     service.isLoggedIn = true;
                     service.username = response.data.username;
-                    console.log(service.username);
                     return response;
                 });
         },
@@ -111,10 +110,10 @@ var sandworm = angular.module('sandworm', [
 .controller('LoginCtrl', ['UserService', '$location', function(UserService, $location) {
     var self = this;
     self.userService = UserService;
-    UserService.user();
     self.user = {username: '', password: ''};
     self.login = function() {
         UserService.login(self.user).then(function(success) {
+            /* login success; navigate to labs */
             $location.path('/labs');
         }, function(error) {
             self.errorMessage = error.data.msg;
@@ -138,23 +137,12 @@ var sandworm = angular.module('sandworm', [
         views: {
             'uir-view-nav': {
                 templateUrl: 'static/views/nav.html',
-                controller: 'LoginCtrl as ctrl'},
+                controller: 'LoginCtrl as ctrl'
+            },
             'uir-view-content': {
-                templateUrl: 'static/views/index.html'
+                templateUrl: 'static/views/index.html',
+                controller: 'LoginCtrl as ctrl'
             }
-        },
-        resolve: {
-            auth: ['$q', '$location', 'UserService', function($q, $location, UserService) {
-                return UserService.user().then(
-                    function(success) {
-                        $location.path('/labs');
-                    },
-                    function(err) {
-                        $location.path('/');
-                        $location.replace();
-                        //return $q.reject(err);
-                    });
-            }]
         }
     }).state('labs', {
         url: '/labs',
@@ -220,14 +208,14 @@ var sandworm = angular.module('sandworm', [
     $urlRouterProvider.otherwise('/');
 }).run(["$rootScope", "$location", 'UserService', function($rootScope, $location, UserService) {
 
+    UserService.user();
+
     $rootScope.$on('$stateChangeStart', function (event, next) {
-        /* prevent user from navigating to private page when not loggin in */
+        /* prevent user from navigating to private page when not loggin in
+         * warn: client-side only! */
         if (!next.data.isPublic && !UserService.isLoggedIn) {
             event.preventDefault();
         }
     });
     
-    $rootScope.$on("$routeChangeError", function(event, current, previous, eventObj) {
-        console.log('routeChangeError ----------');
-    });
 }]);
