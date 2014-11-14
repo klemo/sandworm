@@ -6,16 +6,15 @@ exec/grader playground
 Setup
 =====
 
-currently just a simple angular app with mocked backend
+currently just a simple angular app with tornado backend
 
   1. run with:
     ```shell
-    cd client_app/
-    python -m SimpleHTTPServer
+    cd grader/
+    python server.py
     ```
-    (or use some other HTTP server...)
     
-  2. go to [localhost:8000](http://0.0.0.0:8000/)
+  2. go to [localhost:8000](http://0.0.0.0:8080/)
   
   
   
