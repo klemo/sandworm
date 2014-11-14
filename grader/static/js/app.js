@@ -38,7 +38,7 @@ var sandworm = angular.module('sandworm', [
     user: 'user'
 })
 /** UserService @description deals with user authentication */
-.factory('UserService', ['$http', '$cookies', function($http, $cookies) {
+.factory('UserService', ['$http', function($http) {
     var service = {
         isLoggedIn: false,
         username: null,
@@ -51,8 +51,7 @@ var sandworm = angular.module('sandworm', [
                 });
         },
         login: function(user) {
-            return $http.post('/api/v1/login', user, {
-                headers: {'X-XSRFToken': $cookies._xsrf}})
+            return $http.post('/api/v1/login', user)
                 .then(function(response) {
                     service.isLoggedIn = true;
                     service.username = response.data.username;
@@ -60,8 +59,7 @@ var sandworm = angular.module('sandworm', [
                 });
         },
         logout: function() {
-            return $http.get('/api/v1/logout', {
-                headers: {'X-XSRFToken': $cookies._xsrf}})
+            return $http.get('/api/v1/logout')
                 .then(function(response) {
                     service.isLoggedIn = false;
                     service.username = null;
@@ -206,8 +204,12 @@ var sandworm = angular.module('sandworm', [
     });
     $urlRouterProvider.when('/admin', '/admin/labs');
     $urlRouterProvider.otherwise('/');
-}).run(["$rootScope", "$location", 'UserService', function($rootScope, $location, UserService) {
+}).run(["$rootScope", "$location", '$http', '$cookies', 'UserService', function($rootScope, $location, $http, $cookies, UserService) {
 
+    /* set xsrf header */
+    $http.defaults.headers.post['X-XSRFToken'] = $cookies['_xsrf'];
+
+    /* check auth */
     UserService.user();
 
     $rootScope.$on('$stateChangeStart', function (event, next) {
