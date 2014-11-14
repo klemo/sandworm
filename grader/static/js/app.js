@@ -5,11 +5,12 @@
 
 var sandworm = angular.module('sandworm', [
     'ui.router',
-    'ngResource'
+    'ngResource',
+    'ngCookies'
 ])
 /** LabService @returns list of labs */
 .factory('LabService', ['$resource', function($resource){
-    return $resource('api/labs/:labId.json', {}, {
+    return $resource('static/api/labs/:labId.json', {}, {
         query: {method: 'GET',
                 params: {labId: 'labs'},
                 isArray: true}
@@ -17,7 +18,7 @@ var sandworm = angular.module('sandworm', [
 }])
 /** LabResultsService @returns results for given lab */
 .factory('LabResultsService', ['$resource', function($resource){
-    return $resource('api/labs/:labId/results.json', {}, {
+    return $resource('static/api/labs/:labId/results.json', {}, {
         query: {method: 'GET',
                 params: {labId: 'labs'},
                 isArray: true}
@@ -25,11 +26,41 @@ var sandworm = angular.module('sandworm', [
 }])
 /** AdminResultsService @returns all scores and results */
 .factory('AdminResultsService', ['$resource', function($resource){
-    return $resource('api/results/results.json', {}, {
+    return $resource('static/api/results/results.json', {}, {
         query: {method: 'GET',
                 params: {},
                 isArray: false}
     });
+}])
+/** UserService @description deals with user authentication */
+.factory('UserService', ['$http', '$cookies', function($http, $cookies) {
+    var service = {
+        isLoggedIn: false,
+        user: function() {
+            return $http.get('/api/v1/user')
+                .then(function(response) {
+                    service.isLoggedIn = true;
+                    return response;
+                });
+        },
+        login: function(user) {
+            return $http.post('/api/v1/login', user, {
+                headers: {'X-XSRFToken': $cookies._xsrf}})
+                .then(function(response) {
+                    service.isLoggedIn = true;
+                    return response;
+                });
+        },
+        logout: function() {
+            return $http.get('/api/v1/logout', {
+                headers: {'X-XSRFToken': $cookies._xsrf}})
+                .then(function(response) {
+                    service.isLoggedIn = false;
+                    return response;
+                });
+        }
+    };
+    return service;
 }])
 /** LabCtrl @description displays labs */
 .controller('LabCtrl', ['LabService', function(LabService) {
@@ -67,47 +98,70 @@ var sandworm = angular.module('sandworm', [
     var self = this;
     self.results = AdminResultsService.query();
 }])
+.controller('LoginCtrl', ['UserService', '$location', function(UserService, $location) {
+    var self = this;
+    self.userService = UserService;
+    UserService.user();
+    self.user = {username: '', password: ''};
+    self.login = function() {
+        UserService.login(self.user).then(function(success) {
+            $location.path('/labs');
+        }, function(error) {
+            self.errorMessage = error.data.msg;
+        })
+    };
+    self.logout = function() {
+        UserService.logout().then(function(success) {
+            $location.path('/');
+        }, function(error) {
+            self.errorMessage = error.data.msg;
+        })
+    };
+}])
 .config(function($stateProvider, $urlRouterProvider) {
     /* default (non-admin) pages */
     $stateProvider.state('labs', {
         url: '/labs',
         views: {
-            'uir-view-nav': { templateUrl: 'views/nav.html' },
+            'uir-view-nav': {
+                templateUrl: 'static/views/nav.html',
+                controller: 'LoginCtrl as ctrl'
+            },
             'uir-view-content': {
-                templateUrl: 'views/labs.html',
+                templateUrl: 'static/views/labs.html',
                 controller: 'LabCtrl as labCtrl'}
         }
     }).state('lab', {
         url: '/labs/:labId',
         views: {
-            'uir-view-nav': { templateUrl: 'views/nav.html' },
+            'uir-view-nav': { templateUrl: 'static/views/nav.html' },
             'uir-view-content': {
-                templateUrl: 'views/lab.html',
+                templateUrl: 'static/views/lab.html',
                 controller: 'LabDetailsCtrl as ctrl'}
         }
     /* admin pages */
     }).state('admin-labs', {
         url: '/admin/labs',
         views: {
-            'uir-view-nav': { templateUrl: 'views/admin_nav.html' },
+            'uir-view-nav': { templateUrl: 'static/views/admin_nav.html' },
             'uir-view-content': {
-                templateUrl: 'views/admin_labs.html',
+                templateUrl: 'static/views/admin_labs.html',
                 controller: 'LabCtrl as labCtrl'}
         }
     }).state('admin-lab', {
         url: '/admin/labs/:labId',
         views: {
-            'uir-view-nav': { templateUrl: 'views/admin_nav.html' },
+            'uir-view-nav': { templateUrl: 'static/views/admin_nav.html' },
             'uir-view-content': {
-                templateUrl: 'views/admin_lab.html',
+                templateUrl: 'static/views/admin_lab.html',
                 controller: 'AdminLabDetailsCtrl as ctrl'}
         }
     }).state('admin-results', {
         url: '/admin/results',
         views: {
-            'uir-view-nav': { templateUrl: 'views/admin_nav.html' },
+            'uir-view-nav': { templateUrl: 'static/views/admin_nav.html' },
             'uir-view-content': {
-                templateUrl: 'views/admin_results.html',
+                templateUrl: 'static/views/admin_results.html',
                 controller: 'AdminResultsCtrl as ctrl'}
         }        
     });

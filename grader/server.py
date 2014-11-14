@@ -19,6 +19,7 @@ import simplejson as json
 import urllib
 import settings
 import utils
+import creds
 
 #------------------------------------------------------------------------------
 
@@ -33,8 +34,9 @@ class Application(tornado.web.Application):
             (r'/', MainHandler),
             (r'/api/v1/labs$', LabHandler),
             (r'/api/v1/labs/(.+)', LabHandler),
-            (r'/login', LoginHandler),
-            # (r'/logout', LogoutHandler)
+            (r'/api/v1/login', LoginHandler),
+            (r'/api/v1/logout', LogoutHandler),
+            (r'/api/v1/user', UserHandler)
             ]
         env = dict(
             template_path=os.path.join(
@@ -42,8 +44,9 @@ class Application(tornado.web.Application):
             static_path=os.path.join(
                 os.path.dirname(__file__), 'static'),
             debug=settings.ENV['debug'],
-            xsrf_cookies=False,
-            login_url='/login')
+            xsrf_cookies=True,
+            cookie_secret=creds.COOKIE_SECRET,
+            login_url='/')
         #self.mongo = utils.connect_to_mongo(settings.ENV)
         tornado.web.Application.__init__(self, handlers, **env)
 
@@ -52,10 +55,7 @@ class Application(tornado.web.Application):
 class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
-        auth = utils.authenticate(self)
-        if auth.get('error'):
-            self.set_status(401)
-        self.write(json.dumps(auth))
+        return self.get_secure_cookie('user')
 
 #------------------------------------------------------------------------------
     
@@ -63,14 +63,30 @@ class LoginHandler(BaseHandler):
 
     def post(self):
         user = json.loads(self.request.body)
-        self.write(json.dumps(utils.login(user)))
+        self.set_secure_cookie('username', user['username'])
+        self.write(json.dumps(user['username']))
 
 #------------------------------------------------------------------------------
-        
+
 class LogoutHandler(BaseHandler):
 
     def get(self):
-        self.redirect('/')
+        if self.get_secure_cookie('username'):
+            self.clear_cookie('username')
+            self.finish(json.dumps(True))
+        else:
+            self.finish(json.dumps(False))
+
+#------------------------------------------------------------------------------
+
+class UserHandler(BaseHandler):
+
+    def get(self):
+        if self.get_secure_cookie('username'):
+            self.finish(json.dumps(True))
+        else:
+            self.set_status(401)
+            self.finish(json.dumps(False))
 
 #------------------------------------------------------------------------------
 
