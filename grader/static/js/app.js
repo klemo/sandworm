@@ -32,14 +32,21 @@ var sandworm = angular.module('sandworm', [
                 isArray: false}
     });
 }])
+.constant('USER_ROLES', {
+    all: '*',
+    admin: 'admin',
+    user: 'user'
+})
 /** UserService @description deals with user authentication */
 .factory('UserService', ['$http', '$cookies', function($http, $cookies) {
     var service = {
         isLoggedIn: false,
+        username: null,
         user: function() {
             return $http.get('/api/v1/user')
                 .then(function(response) {
                     service.isLoggedIn = true;
+                    service.username = response.data.username;
                     return response;
                 });
         },
@@ -48,6 +55,8 @@ var sandworm = angular.module('sandworm', [
                 headers: {'X-XSRFToken': $cookies._xsrf}})
                 .then(function(response) {
                     service.isLoggedIn = true;
+                    service.username = response.data.username;
+                    console.log(service.username);
                     return response;
                 });
         },
@@ -56,6 +65,7 @@ var sandworm = angular.module('sandworm', [
                 headers: {'X-XSRFToken': $cookies._xsrf}})
                 .then(function(response) {
                     service.isLoggedIn = false;
+                    service.username = null;
                     return response;
                 });
         }
@@ -120,8 +130,37 @@ var sandworm = angular.module('sandworm', [
 }])
 .config(function($stateProvider, $urlRouterProvider) {
     /* default (non-admin) pages */
-    $stateProvider.state('labs', {
+    $stateProvider.state('index', {
+        url: '/',
+        data: {
+            isPublic: true,
+        },
+        views: {
+            'uir-view-nav': {
+                templateUrl: 'static/views/nav.html',
+                controller: 'LoginCtrl as ctrl'},
+            'uir-view-content': {
+                templateUrl: 'static/views/index.html'
+            }
+        },
+        resolve: {
+            auth: ['$q', '$location', 'UserService', function($q, $location, UserService) {
+                return UserService.user().then(
+                    function(success) {
+                        $location.path('/labs');
+                    },
+                    function(err) {
+                        $location.path('/');
+                        $location.replace();
+                        //return $q.reject(err);
+                    });
+            }]
+        }
+    }).state('labs', {
         url: '/labs',
+        data: {
+            isPublic: false,
+        },
         views: {
             'uir-view-nav': {
                 templateUrl: 'static/views/nav.html',
@@ -133,6 +172,9 @@ var sandworm = angular.module('sandworm', [
         }
     }).state('lab', {
         url: '/labs/:labId',
+        data: {
+            isPublic: false,
+        },
         views: {
             'uir-view-nav': { templateUrl: 'static/views/nav.html' },
             'uir-view-content': {
@@ -142,6 +184,9 @@ var sandworm = angular.module('sandworm', [
     /* admin pages */
     }).state('admin-labs', {
         url: '/admin/labs',
+        data: {
+            isPublic: false,
+        },
         views: {
             'uir-view-nav': { templateUrl: 'static/views/admin_nav.html' },
             'uir-view-content': {
@@ -150,6 +195,9 @@ var sandworm = angular.module('sandworm', [
         }
     }).state('admin-lab', {
         url: '/admin/labs/:labId',
+        data: {
+            isPublic: false,
+        },
         views: {
             'uir-view-nav': { templateUrl: 'static/views/admin_nav.html' },
             'uir-view-content': {
@@ -158,6 +206,9 @@ var sandworm = angular.module('sandworm', [
         }
     }).state('admin-results', {
         url: '/admin/results',
+        data: {
+            isPublic: false,
+        },
         views: {
             'uir-view-nav': { templateUrl: 'static/views/admin_nav.html' },
             'uir-view-content': {
@@ -166,5 +217,17 @@ var sandworm = angular.module('sandworm', [
         }        
     });
     $urlRouterProvider.when('/admin', '/admin/labs');
-    $urlRouterProvider.otherwise('/labs');
-});
+    $urlRouterProvider.otherwise('/');
+}).run(["$rootScope", "$location", 'UserService', function($rootScope, $location, UserService) {
+
+    $rootScope.$on('$stateChangeStart', function (event, next) {
+        /* prevent user from navigating to private page when not loggin in */
+        if (!next.data.isPublic && !UserService.isLoggedIn) {
+            event.preventDefault();
+        }
+    });
+    
+    $rootScope.$on("$routeChangeError", function(event, current, previous, eventObj) {
+        console.log('routeChangeError ----------');
+    });
+}]);

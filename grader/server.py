@@ -64,7 +64,7 @@ class LoginHandler(BaseHandler):
     def post(self):
         user = json.loads(self.request.body)
         self.set_secure_cookie('username', user['username'])
-        self.write(json.dumps(user['username']))
+        self.write(json.dumps({'username': user['username']}))
 
 #------------------------------------------------------------------------------
 
@@ -82,10 +82,11 @@ class LogoutHandler(BaseHandler):
 class UserHandler(BaseHandler):
 
     def get(self):
-        if self.get_secure_cookie('username'):
-            self.finish(json.dumps(True))
+        username = self.get_secure_cookie('username')
+        if username:
+            self.finish(json.dumps({'username': username}))
         else:
-            self.set_status(401)
+            self.set_status(400)
             self.finish(json.dumps(False))
 
 #------------------------------------------------------------------------------
@@ -93,9 +94,6 @@ class UserHandler(BaseHandler):
 class MainHandler(BaseHandler):
 
     def get(self):
-        self.render('index.html')
-
-    def post(self):
         self.render('index.html')
 
 #------------------------------------------------------------------------------
