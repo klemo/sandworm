@@ -3,7 +3,7 @@
 describe('Sandowrm App', function() {
 
     it('should display login form', function() {
-        browser.get('/');
+        browser.driver.get('http://localhost:8080/#/');
         expect(element(by.css('.signin-link')).isDisplayed())
             .toBe(true);
     });
@@ -11,7 +11,7 @@ describe('Sandowrm App', function() {
     describe('Basic lab list', function() {
 
         it('should login user', function() {
-            browser.get('/#/');
+            browser.get('http://localhost:8080/#/');
             var username = element(
                 by.model('ctrl.user.username'));
             var password = element(

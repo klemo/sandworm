@@ -47,7 +47,10 @@ var sandworm = angular.module('sandworm', [
             isPublic: false,
         },
         views: {
-            'uir-view-nav': { templateUrl: 'static/views/nav.html' },
+            'uir-view-nav': {
+                templateUrl: 'static/views/nav.html',
+                controller: 'LoginCtrl as ctrl'
+            },
             'uir-view-content': {
                 templateUrl: 'static/views/lab.html',
                 controller: 'LabDetailsCtrl as ctrl'}
@@ -59,7 +62,10 @@ var sandworm = angular.module('sandworm', [
             isPublic: false,
         },
         views: {
-            'uir-view-nav': { templateUrl: 'static/views/admin_nav.html' },
+            'uir-view-nav': {
+                templateUrl: 'static/views/admin_nav.html',
+                controller: 'LoginCtrl as ctrl'
+            },
             'uir-view-content': {
                 templateUrl: 'static/views/admin_labs.html',
                 controller: 'LabCtrl as labCtrl'}
@@ -70,7 +76,10 @@ var sandworm = angular.module('sandworm', [
             isPublic: false,
         },
         views: {
-            'uir-view-nav': { templateUrl: 'static/views/admin_nav.html' },
+            'uir-view-nav': {
+                templateUrl: 'static/views/admin_nav.html',
+                controller: 'LoginCtrl as ctrl'
+            },
             'uir-view-content': {
                 templateUrl: 'static/views/admin_lab.html',
                 controller: 'AdminLabDetailsCtrl as ctrl'}
@@ -81,7 +90,10 @@ var sandworm = angular.module('sandworm', [
             isPublic: false,
         },
         views: {
-            'uir-view-nav': { templateUrl: 'static/views/admin_nav.html' },
+            'uir-view-nav': {
+                templateUrl: 'static/views/admin_nav.html',
+                controller: 'LoginCtrl as ctrl'
+            },
             'uir-view-content': {
                 templateUrl: 'static/views/admin_results.html',
                 controller: 'AdminResultsCtrl as ctrl'}
@@ -89,7 +101,7 @@ var sandworm = angular.module('sandworm', [
     });
     $urlRouterProvider.when('/admin', '/admin/labs');
     $urlRouterProvider.otherwise('/');
-}).run(["$rootScope", "$location", '$http', '$cookies', 'UserService', function($rootScope, $location, $http, $cookies, UserService) {
+}).run(["$rootScope", "$location", '$http', '$cookies', '$state', 'UserService', function($rootScope, $location, $http, $cookies, $state, UserService) {
 
     /* set xsrf header */
     $http.defaults.headers.post['X-XSRFToken'] = $cookies['_xsrf'];
@@ -101,6 +113,7 @@ var sandworm = angular.module('sandworm', [
         /* prevent user from navigating to private page when not loggin in
          * warn: client-side only! */
         if (!next.data.isPublic && !UserService.isLoggedIn) {
+            $state.go('index');
             event.preventDefault();
         }
     });
