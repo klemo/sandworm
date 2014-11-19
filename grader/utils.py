@@ -13,15 +13,17 @@ def jsonify(req, data):
 
 #------------------------------------------------------------------------------
 
-def auth(method):
-    '''
-    Custom auth handler
-    '''
-    @functools.wraps(method)
-    def wrapper(self, *args, **kwargs):
-        if not self.current_user:
-            self.set_status(400)
-            jsonify(self, {'error': 'not authenticated'})
-            return
-        return method(self, *args, **kwargs)
-    return wrapper
+def auth(role='user'):
+    def authenticate(method):
+        '''
+        Custom auth handler
+        '''
+        @functools.wraps(method)
+        def wrapper(self, *args, **kwargs):
+            if not self.current_user:
+                self.set_status(400)
+                jsonify(self, {'error': 'not authenticated'})
+                return
+            return method(self, *args, **kwargs)
+        return wrapper
+    return authenticate

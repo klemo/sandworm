@@ -75,7 +75,7 @@ class LoginHandler(BaseHandler):
 
 class LogoutHandler(BaseHandler):
 
-    @utils.auth
+    @utils.auth()
     def get(self):
         self.clear_cookie('username')
         utils.jsonify(self, True)
@@ -84,7 +84,7 @@ class LogoutHandler(BaseHandler):
 
 class UserHandler(BaseHandler):
 
-    @utils.auth
+    @utils.auth()
     def get(self):
         username = self.current_user
         utils.jsonify(self, db.get_user(username))
@@ -101,7 +101,7 @@ class MainHandler(BaseHandler):
 
 class LabHandler(BaseHandler):
 
-    @utils.auth
+    @utils.auth('admin')
     def get(self, lab_id=None):
         if lab_id:
             utils.jsonify(self, True)
