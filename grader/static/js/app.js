@@ -121,11 +121,10 @@ var sandworm = angular.module('sandworm', [
     /* set xsrf header */
     $http.defaults.headers.post['X-XSRFToken'] = $cookies['_xsrf'];
 
-    /* check auth */
     UserService.user();
 
     $rootScope.$on('$stateChangeStart', function (event, next) {
-        /* prevent user from navigating to private page when not loggin in
+        /* prevent user from navigating to private page when not logged in
          * warn: client-side only! */
         if (!next.data.isPublic && !UserService.isLoggedIn) {
             $state.go('login');

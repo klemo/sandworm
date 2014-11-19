@@ -45,8 +45,7 @@ class Application(tornado.web.Application):
                 os.path.dirname(__file__), 'static'),
             debug=settings.ENV['debug'],
             xsrf_cookies=True,
-            cookie_secret=creds.COOKIE_SECRET,
-            login_url='/')
+            cookie_secret=creds.COOKIE_SECRET)
         #self.mongo = utils.connect_to_mongo(settings.ENV)
         tornado.web.Application.__init__(self, handlers, **env)
 
@@ -55,7 +54,7 @@ class Application(tornado.web.Application):
 class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
-        return self.get_secure_cookie('user')
+        return self.get_secure_cookie('username')
 
 #------------------------------------------------------------------------------
     
@@ -66,33 +65,28 @@ class LoginHandler(BaseHandler):
         # devel only, obviously...
         if user['password'] == 'test':
             self.set_secure_cookie('username', user['username'])
-            self.write(json.dumps({'username': user['username']}))
+            utils.jsonify(self, {'username': user['username']})
         else:
             self.set_status(401)
-            self.write(json.dumps({'msg': 'username/password error'}))
+            utils.jsonify(self, {'error': 'username/password'})
 
 #------------------------------------------------------------------------------
 
 class LogoutHandler(BaseHandler):
 
+    @utils.auth
     def get(self):
-        if self.get_secure_cookie('username'):
-            self.clear_cookie('username')
-            self.finish(json.dumps(True))
-        else:
-            self.finish(json.dumps(False))
+        self.clear_cookie('username')
+        utils.jsonify(self, True)
 
 #------------------------------------------------------------------------------
 
 class UserHandler(BaseHandler):
 
+    @utils.auth
     def get(self):
-        username = self.get_secure_cookie('username')
-        if username:
-            self.finish(json.dumps({'username': username}))
-        else:
-            self.set_status(400)
-            self.finish(json.dumps(False))
+        username = self.current_user
+        utils.jsonify(self, {'username': username})
 
 #------------------------------------------------------------------------------
 
@@ -106,11 +100,12 @@ class MainHandler(BaseHandler):
 
 class LabHandler(BaseHandler):
 
+    @utils.auth
     def get(self, lab_id=None):
         if lab_id:
-            self.write(json.dumps(True))
+            utils.jsonify(self, True)
         else:
-            self.write(json.dumps([1,2,3]))
+            utils.jsonify(self, [1,2,3])
         
 #------------------------------------------------------------------------------
         
