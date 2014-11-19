@@ -41,12 +41,12 @@ var sandwormServices = angular.module('sandwormServices', [
 .factory('UserService', ['$http', function($http) {
     var service = {
         isLoggedIn: false,
-        user: null,
+        currentUser: undefined,
         user: function() {
             return $http.get('/api/v1/user')
                 .then(function(response) {
                     service.isLoggedIn = true;
-                    service.user = response.data;
+                    service.currentUser = response.data;
                     return response;
                 });
         },
@@ -54,7 +54,7 @@ var sandwormServices = angular.module('sandwormServices', [
             return $http.post('/api/v1/login', user)
                 .then(function(response) {
                     service.isLoggedIn = true;
-                    service.user = response.data;
+                    service.currentUser = response.data;
                     return response;
                 });
         },
@@ -62,7 +62,7 @@ var sandwormServices = angular.module('sandwormServices', [
             return $http.get('/api/v1/logout')
                 .then(function(response) {
                     service.isLoggedIn = false;
-                    service.user = null;
+                    service.currentUser = undefined;
                     return response;
                 });
         }

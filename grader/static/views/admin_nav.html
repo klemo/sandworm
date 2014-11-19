@@ -1,6 +1,4 @@
 <ul class="nav navbar-nav">
-  <li><a href="#/">Početna</a></li>
-  <li class="active"><a href="#/admin/labs">Admin</a></li>
   <li class="dropdown">
     <a href="" class="dropdown-toggle" data-toggle="dropdown">Bodovi <span class="caret"></span></a>
     <ul class="dropdown-menu" role="menu">
@@ -12,8 +10,11 @@
 
 <ul class="nav navbar-nav navbar-right" ng-show="ctrl.userService.isLoggedIn">
   <li>
-    <p class="navbar-text">Signed in as
-      <a href="#" class="navbar-link">{{ctrl.userService.user.username}}</a></p>
+    <p class="navbar-text">
+      Signed in as
+      <a href="#" class="navbar-link">{{ctrl.userService.currentUser.username}}</a>
+      <span class="label label-danger">admin</span>
+    </p>
   </li>
   <li>
     <form class="navbar-form navbar-right" role="form" name="logoutForm" ng-submit="ctrl.logout()">

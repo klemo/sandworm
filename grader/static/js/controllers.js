@@ -67,7 +67,7 @@ var sandwormControllers = angular.module('sandwormControllers', [
     var self = this;
     self.userService = UserService;
     if (self.userService.isLoggedIn) {
-        if (self.userService.user.role == 'admin') {
+        if (self.userService.currentUser.role == 'admin') {
             $state.go('admin-labs');
         } else {
             $state.go('labs');

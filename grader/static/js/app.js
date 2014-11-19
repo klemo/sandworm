@@ -9,13 +9,13 @@ var sandworm = angular.module('sandworm', [
     'ngCookies',
     'sandwormServices',
     'sandwormControllers'
-    
 ]).config(function($stateProvider, $urlRouterProvider) {
     /* default (non-admin) pages */
     $stateProvider.state('index', {
         url: '/',
         data: {
             isPublic: true,
+            access: 'user',
         },
         views: {
             'uir-view-nav': {
@@ -31,6 +31,7 @@ var sandworm = angular.module('sandworm', [
         url: '/login',
         data: {
             isPublic: true,
+            access: 'user',
         },
         views: {
             'uir-view-nav': {
@@ -46,6 +47,7 @@ var sandworm = angular.module('sandworm', [
         url: '/labs',
         data: {
             isPublic: false,
+            access: 'user',
         },
         views: {
             'uir-view-nav': {
@@ -60,6 +62,7 @@ var sandworm = angular.module('sandworm', [
         url: '/labs/:labId',
         data: {
             isPublic: false,
+            access: 'user',
         },
         views: {
             'uir-view-nav': {
@@ -75,6 +78,7 @@ var sandworm = angular.module('sandworm', [
         url: '/admin/labs',
         data: {
             isPublic: false,
+            access: 'admin',
         },
         views: {
             'uir-view-nav': {
@@ -89,6 +93,7 @@ var sandworm = angular.module('sandworm', [
         url: '/admin/labs/:labId',
         data: {
             isPublic: false,
+            access: 'admin',
         },
         views: {
             'uir-view-nav': {
@@ -103,6 +108,7 @@ var sandworm = angular.module('sandworm', [
         url: '/admin/results',
         data: {
             isPublic: false,
+            access: 'admin',
         },
         views: {
             'uir-view-nav': {
@@ -116,7 +122,9 @@ var sandworm = angular.module('sandworm', [
     });
     $urlRouterProvider.when('/admin', '/admin/labs');
     $urlRouterProvider.otherwise('/');
-}).run(["$rootScope", "$location", '$http', '$cookies', '$state', 'UserService', function($rootScope, $location, $http, $cookies, $state, UserService) {
+    
+}).run(['$rootScope', '$location', '$http', '$cookies', '$state', 'UserService',
+        function($rootScope, $location, $http, $cookies, $state, UserService) {
 
     /* set xsrf header */
     $http.defaults.headers.post['X-XSRFToken'] = $cookies['_xsrf'];
@@ -124,11 +132,17 @@ var sandworm = angular.module('sandworm', [
     UserService.user();
 
     $rootScope.$on('$stateChangeStart', function (event, next) {
-        /* prevent user from navigating to private page when not logged in
+        /* prevent user from navigating to non-authorized or private resource
          * warn: client-side only! */
-        if (!next.data.isPublic && !UserService.isLoggedIn) {
-            $state.go('login');
-            event.preventDefault();
+        if (UserService.isLoggedIn) {
+            if (next.data.access != UserService.currentUser.role) {
+                event.preventDefault();
+            }
+        } else {
+            if (!next.data.isPublic) {
+                event.preventDefault();
+                $state.go('login');
+            }
         }
     });
     

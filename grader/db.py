@@ -8,5 +8,8 @@ import simplejson as json
 #------------------------------------------------------------------------------
 
 def get_user(username):
+    role = 'user'
+    if username == 'admin':
+        role = 'admin'
     return {'username': username,
-            'role': 'admin'}
+            'role': role}
