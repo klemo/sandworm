@@ -2,6 +2,11 @@
 
 describe('Sandowrm App', function() {
 
+    it('should redirect to login', function() {
+        browser.driver.get('http://localhost:8080/#/');
+        expect(browser.getCurrentUrl()).toEqual('http://localhost:8080/#/login');
+    });
+
     it('should display login form', function() {
         browser.driver.get('http://localhost:8080/#/');
         expect(element(by.css('.signin-link')).isDisplayed())
@@ -42,9 +47,14 @@ describe('Sandowrm App', function() {
         it('should sign out current user', function() {
             browser.driver.get('http://localhost:8080/#/');
             element(by.css('.signout-link')).click();
-            expect(browser.getCurrentUrl()).toEqual('http://localhost:8080/#/');
+            expect(browser.getCurrentUrl()).toEqual('http://localhost:8080/#/login');
             expect(element(by.css('.signin-link')).isDisplayed())
                 .toBe(true);
+        });
+
+        it('should redirect to login when accessing private resource', function() {
+            browser.driver.get('http://localhost:8080/#/labs/lab-1');
+            expect(browser.getCurrentUrl()).toEqual('http://localhost:8080/#/login');
         });
     });
 });

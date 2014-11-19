@@ -24,6 +24,21 @@ var sandworm = angular.module('sandworm', [
             },
             'uir-view-content': {
                 templateUrl: 'static/views/index.html',
+                controller: 'IndexCtrl as ctrl'
+            }
+        }
+    }).state('login', {
+        url: '/login',
+        data: {
+            isPublic: true,
+        },
+        views: {
+            'uir-view-nav': {
+                templateUrl: 'static/views/nav.html',
+                controller: 'LoginCtrl as ctrl'
+            },
+            'uir-view-content': {
+                templateUrl: 'static/views/index.html',
                 controller: 'LoginCtrl as ctrl'
             }
         }
@@ -113,7 +128,7 @@ var sandworm = angular.module('sandworm', [
         /* prevent user from navigating to private page when not loggin in
          * warn: client-side only! */
         if (!next.data.isPublic && !UserService.isLoggedIn) {
-            $state.go('index');
+            $state.go('login');
             event.preventDefault();
         }
     });

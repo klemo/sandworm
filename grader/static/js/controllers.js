@@ -64,3 +64,12 @@ var sandwormControllers = angular.module('sandwormControllers', [
         })
     };
 }])
+.controller('IndexCtrl', ['UserService', '$state', function(UserService, $state) {
+    var self = this;
+    self.userService = UserService;
+    if (self.userService.isLoggedIn) {
+        $state.go('labs');
+    } else {
+        $state.go('login');
+    };
+}]);
