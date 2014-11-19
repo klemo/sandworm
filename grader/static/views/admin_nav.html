@@ -13,7 +13,7 @@
 <ul class="nav navbar-nav navbar-right" ng-show="ctrl.userService.isLoggedIn">
   <li>
     <p class="navbar-text">Signed in as
-      <a href="#" class="navbar-link">{{ctrl.userService.username}}</a></p>
+      <a href="#" class="navbar-link">{{ctrl.userService.user.username}}</a></p>
   </li>
   <li>
     <form class="navbar-form navbar-right" role="form" name="logoutForm" ng-submit="ctrl.logout()">

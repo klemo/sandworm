@@ -19,6 +19,7 @@ import simplejson as json
 import urllib
 import settings
 import utils
+import db
 import creds
 
 #------------------------------------------------------------------------------
@@ -65,7 +66,7 @@ class LoginHandler(BaseHandler):
         # devel only, obviously...
         if user['password'] == 'test':
             self.set_secure_cookie('username', user['username'])
-            utils.jsonify(self, {'username': user['username']})
+            utils.jsonify(self, db.get_user(user['username']))
         else:
             self.set_status(401)
             utils.jsonify(self, {'error': 'username/password'})
@@ -86,7 +87,7 @@ class UserHandler(BaseHandler):
     @utils.auth
     def get(self):
         username = self.current_user
-        utils.jsonify(self, {'username': username})
+        utils.jsonify(self, db.get_user(username))
 
 #------------------------------------------------------------------------------
 

@@ -44,21 +44,20 @@ var sandwormControllers = angular.module('sandwormControllers', [
     var self = this;
     self.results = AdminResultsService.query();
 }])
-.controller('LoginCtrl', ['UserService', '$location', function(UserService, $location) {
+.controller('LoginCtrl', ['UserService', '$state', function(UserService, $state) {
     var self = this;
     self.userService = UserService;
     self.user = {username: '', password: ''};
     self.login = function() {
         UserService.login(self.user).then(function(success) {
-            /* login success; navigate to labs */
-            $location.path('/labs');
+            $state.go('index');
         }, function(error) {
             self.errorMessage = error.data.msg;
         })
     };
     self.logout = function() {
         UserService.logout().then(function(success) {
-            $location.path('/');
+            $state.go('index');
         }, function(error) {
             self.errorMessage = error.data.msg;
         })
@@ -68,7 +67,11 @@ var sandwormControllers = angular.module('sandwormControllers', [
     var self = this;
     self.userService = UserService;
     if (self.userService.isLoggedIn) {
-        $state.go('labs');
+        if (self.userService.user.role == 'admin') {
+            $state.go('admin-labs');
+        } else {
+            $state.go('labs');
+        }
     } else {
         $state.go('login');
     };
