@@ -52,14 +52,14 @@ var sandwormControllers = angular.module('sandwormControllers', [
         UserService.login(self.user).then(function(success) {
             $state.go('index');
         }, function(error) {
-            self.errorMessage = error.data.msg;
+            self.errorMessage = error.data.err;
         })
     };
     self.logout = function() {
         UserService.logout().then(function(success) {
             $state.go('index');
         }, function(error) {
-            self.errorMessage = error.data.msg;
+            self.errorMessage = error.data.err;
         })
     };
 }])

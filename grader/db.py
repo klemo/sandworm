@@ -17,3 +17,14 @@ PUBLIC_USER_PROPS = {
 def get_user(db, username):
     user = db.users.find_one({'username': username}, PUBLIC_USER_PROPS)
     return user
+
+#------------------------------------------------------------------------------
+
+def login_user(db, logindata):
+    # todo: validate login data
+    user = db.users.find_one({'username': logindata['username']},
+                             PUBLIC_USER_PROPS)
+    # todo: check password...
+    if not user:
+        return None, 'no such user'
+    return user, None

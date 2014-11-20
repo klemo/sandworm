@@ -55,21 +55,22 @@ class Application(tornado.web.Application):
 class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
-        return self.get_secure_cookie('username')
+        username = self.get_secure_cookie('username')
+        return db.get_user(self.application.db, username)
 
 #------------------------------------------------------------------------------
     
 class LoginHandler(BaseHandler):
 
     def post(self):
-        user = json.loads(self.request.body)
-        # devel only, obviously...
-        if user['password'] == 'test':
+        logindata = json.loads(self.request.body)
+        user, err = db.login_user(self.application.db, logindata)
+        if user:
             self.set_secure_cookie('username', user['username'])
-            utils.jsonify(self, db.get_user(self.application.db, user['username']))
+            utils.jsonify(self, user)
         else:
             self.set_status(401)
-            utils.jsonify(self, {'error': 'username/password'})
+            utils.jsonify(self, {'code': 'login-failed', 'err': err})
 
 #------------------------------------------------------------------------------
 
@@ -86,8 +87,7 @@ class UserHandler(BaseHandler):
 
     @utils.auth()
     def get(self):
-        username = self.current_user
-        utils.jsonify(self, db.get_user(self.application.db, username))
+        utils.jsonify(self, self.get_current_user())
 
 #------------------------------------------------------------------------------
 
