@@ -3,13 +3,17 @@
 #------------------------------------------------------------------------------
 
 import functools
+import pymongo
+import argparse
 import simplejson as json
+from bson import json_util
+import settings
 
 #------------------------------------------------------------------------------
 
 def jsonify(req, data):
     req.set_header('Content-Type', 'application/json')
-    req.write(json.dumps(data))
+    req.write(json.dumps(data, default=json_util.default))
 
 #------------------------------------------------------------------------------
 
@@ -27,3 +31,47 @@ def auth(role='user'):
             return method(self, *args, **kwargs)
         return wrapper
     return authenticate
+
+#------------------------------------------------------------------------------
+
+def connect_to_mongo(env):
+    '''
+    Use this function to connect to mongo database
+    '''
+    try:
+        client = pymongo.MongoClient('localhost', port=env['mongoport'])
+        db = client['sandworm']
+        if env['mongoauth']:
+            db.authenticate(env['mongouser'], env['mongopassword'])
+        return db
+    except Exception as e:
+        print('Mongo: ', e)
+    return None
+
+#------------------------------------------------------------------------------
+
+def load_fixtures(collections=['users']):
+    '''
+    Loads fixture data to db (users...)
+    '''
+    print('Load fixtures')
+    db = connect_to_mongo(settings.ENV)
+    for c in collections:
+        print(' drop collection {}'.format(c))
+        db[c].drop()
+        with open('test/fixtures/{}.json'.format(c), 'r') as f:
+            users = json.loads(f.read())
+            for u in users:
+                print(' add user {}'.format(u['username']))
+                db[c].insert(u)
+
+#------------------------------------------------------------------------------
+
+if __name__=='__main__':
+    parser = argparse.ArgumentParser(description='misc utils')
+    parser.add_argument('--fixtures', help='load fixtures', default=False,
+                        const='True', nargs='?')
+
+    args = parser.parse_args()
+    if args.fixtures:
+        load_fixtures()

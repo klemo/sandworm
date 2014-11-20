@@ -47,7 +47,7 @@ class Application(tornado.web.Application):
             debug=settings.ENV['debug'],
             xsrf_cookies=True,
             cookie_secret=creds.COOKIE_SECRET)
-        #self.mongo = utils.connect_to_mongo(settings.ENV)
+        self.db = utils.connect_to_mongo(settings.ENV)
         tornado.web.Application.__init__(self, handlers, **env)
 
 #------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ class LoginHandler(BaseHandler):
         # devel only, obviously...
         if user['password'] == 'test':
             self.set_secure_cookie('username', user['username'])
-            utils.jsonify(self, db.get_user(user['username']))
+            utils.jsonify(self, db.get_user(self.application.db, user['username']))
         else:
             self.set_status(401)
             utils.jsonify(self, {'error': 'username/password'})
@@ -87,7 +87,7 @@ class UserHandler(BaseHandler):
     @utils.auth()
     def get(self):
         username = self.current_user
-        utils.jsonify(self, db.get_user(username))
+        utils.jsonify(self, db.get_user(self.application.db, username))
 
 #------------------------------------------------------------------------------
 

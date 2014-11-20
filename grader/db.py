@@ -7,9 +7,13 @@ import simplejson as json
 
 #------------------------------------------------------------------------------
 
-def get_user(username):
-    role = 'user'
-    if username == 'admin':
-        role = 'admin'
-    return {'username': username,
-            'role': role}
+PUBLIC_USER_PROPS = {
+    '_id': 0,
+    'password': 0
+    }
+
+#------------------------------------------------------------------------------
+
+def get_user(db, username):
+    user = db.users.find_one({'username': username}, PUBLIC_USER_PROPS)
+    return user
