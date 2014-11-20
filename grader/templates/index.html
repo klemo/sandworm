@@ -5,9 +5,9 @@
     <title>Sandworm</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="static/vendor/css/bootstrap.min.css">
-    <link rel="stylesheet" href="static/vendor/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="static/css/app.css">
+    <link rel="stylesheet" href="{{ static_url("vendor/css/bootstrap.min.css") }}">
+    <link rel="stylesheet" href="{{ static_url("vendor/css/bootstrap-theme.min.css") }}">
+    <link rel="stylesheet" href="{{ static_url("css/app.css") }}">
   </head>
   <body ng-app="sandworm">
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -31,14 +31,14 @@
       <div ui-view="uir-view-content"></div>
     </div>
 
-    <script src="static/vendor/js/jquery-2.1.1.min.js"></script>
-    <script src="static/vendor/js/angular.min.js"></script>
-    <script src="static/vendor/js/angular-ui-router.min.js"></script>
-    <script src="static/vendor/js/angular-resource.min.js"></script>
-    <script src="static/vendor/js/angular-cookies.min.js"></script>
-    <script src="static/vendor/js/bootstrap.min.js"></script>
-    <script src="static/js/app.js"></script>
-    <script src="static/js/services.js"></script>
-    <script src="static/js/controllers.js"></script>
+    <script src="{{ static_url("vendor/js/jquery-2.1.1.min.js") }}"></script>
+    <script src="{{ static_url("vendor/js/angular.min.js") }}"></script>
+    <script src="{{ static_url("vendor/js/angular-ui-router.min.js") }}"></script>
+    <script src="{{ static_url("vendor/js/angular-resource.min.js") }}"></script>
+    <script src="{{ static_url("vendor/js/angular-cookies.min.js") }}"></script>
+    <script src="{{ static_url("vendor/js/bootstrap.min.js") }}"></script>
+    <script src="{{ static_url("js/app.js") }}"></script>
+    <script src="{{ static_url("js/services.js") }}"></script>
+    <script src="{{ static_url("js/controllers.js") }}"></script>
   </body>
 </html>

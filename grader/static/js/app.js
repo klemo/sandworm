@@ -15,7 +15,7 @@ var sandworm = angular.module('sandworm', [
         url: '/',
         data: {
             isPublic: true,
-            access: 'user',
+            access: '*',
         },
         views: {
             'uir-view-nav': {
@@ -31,7 +31,7 @@ var sandworm = angular.module('sandworm', [
         url: '/login',
         data: {
             isPublic: true,
-            access: 'user',
+            access: '*',
         },
         views: {
             'uir-view-nav': {
@@ -135,7 +135,7 @@ var sandworm = angular.module('sandworm', [
         /* prevent user from navigating to non-authorized or private resource
          * warn: client-side only! */
         if (UserService.isLoggedIn) {
-            if (next.data.access != UserService.currentUser.role) {
+            if (next.data.access !== '*' && next.data.access != UserService.currentUser.role) {
                 event.preventDefault();
             }
         } else {
