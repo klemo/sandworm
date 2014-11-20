@@ -48,7 +48,8 @@ var sandwormControllers = angular.module('sandwormControllers', [
     var now = Date.now();
     self.labs = LabService.query(function(labs) {
         labs = angular.forEach(labs, function(lab) {
-            lab.isOver = lab.end < now;
+            // console.log(lab.end, now);
+            // lab.isOver = angular.fromJson(lab.end) < now;
         });
     });
 }])

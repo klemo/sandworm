@@ -2,7 +2,17 @@
     {
         "username": "test",
         "password": "test",
-        "role": "user"
+        "role": "user",
+        "labs": [
+            {
+                "id": "lab-1",
+                "submitted": true
+            },
+            {
+                "id": "lab-2",
+                "submitted": false
+            }
+        ]
     },
     {
         "username": "admin",

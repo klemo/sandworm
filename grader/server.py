@@ -105,25 +105,16 @@ class AdminLabHandler(BaseHandler):
 
     @utils.auth('admin')
     def get(self, lab_id=None):
-        if lab_id:
-            # get specific lab with results
-            lab = db.get_admin_labs(self.application.db, lab_id)
-            utils.jsonify(self, lab)
-        else:
-            # get list of all labs
-            labs = db.get_admin_labs(self.application.db)
-            utils.jsonify(self, list(labs))
+        utils.jsonify(self, db.get_admin_labs(self.application.db, lab_id))
 
 #------------------------------------------------------------------------------
 
 class LabHandler(BaseHandler):
 
-    @utils.auth('admin')
+    @utils.auth('user')
     def get(self, lab_id=None):
-        if lab_id:
-            utils.jsonify(self, True)
-        else:
-            utils.jsonify(self, [1,2,3])
+        utils.jsonify(self, db.get_labs(
+                self.application.db, self.get_current_user()))
         
 #------------------------------------------------------------------------------
         

@@ -28,6 +28,9 @@ def auth(role='user'):
                 self.set_status(400)
                 jsonify(self, {'error': 'not authenticated'})
                 return
+            if self.current_user['role'] <> role:
+                jsonify(self, {'error': 'not authorized'})
+                return
             return method(self, *args, **kwargs)
         return wrapper
     return authenticate
