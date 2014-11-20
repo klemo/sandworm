@@ -1,0 +1,18 @@
+[
+    {
+        "name": "LAB2", 
+        "id": "lab-2", 
+        "desc": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
+        "start": "2014-11-01T11:17:11.336Z",
+        "end": "2015-11-19T11:17:11.336Z",
+        "published": false
+    },
+    {
+        "name": "LAB1", 
+        "id": "lab-1", 
+        "desc": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
+        "start": "2014-11-01T11:17:11.336Z",
+        "end": "2014-11-19T11:17:11.336Z",
+        "published": true
+    }
+]

@@ -8,6 +8,30 @@ var sandwormServices = angular.module('sandwormServices', [
     'ngResource',
     'ngCookies'
 ])
+.constant('API', {
+    user: 'api/v1',
+    admin: 'api/v1/admin',
+})
+
+/* Admin services */
+/** AdminLabService @returns list of labs */
+.factory('AdminLabService', ['$resource', 'API', function($resource, API) {
+    return $resource(API.admin + '/labs/:labId', {}, {
+        query: {method: 'GET',
+                params: {labId: ''},
+                isArray: true}
+    });
+}])
+/** AdminResultsService @returns all scores and results */
+.factory('AdminResultsService', ['$resource', 'API',  function($resource, API) {
+    return $resource(API.admin + '/results', {}, {
+        query: {method: 'GET',
+                params: {},
+                isArray: false}
+    });
+}])
+
+/* User services */
 /** LabService @returns list of labs */
 .factory('LabService', ['$resource', function($resource){
     return $resource('static/api/labs/:labId.json', {}, {
@@ -24,19 +48,6 @@ var sandwormServices = angular.module('sandwormServices', [
                 isArray: true}
     });
 }])
-/** AdminResultsService @returns all scores and results */
-.factory('AdminResultsService', ['$resource', function($resource){
-    return $resource('static/api/results/results.json', {}, {
-        query: {method: 'GET',
-                params: {},
-                isArray: false}
-    });
-}])
-.constant('USER_ROLES', {
-    all: '*',
-    admin: 'admin',
-    user: 'user'
-})
 /** UserService @description deals with user authentication */
 .factory('UserService', ['$http', function($http) {
     var service = {

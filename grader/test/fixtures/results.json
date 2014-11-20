@@ -1,0 +1,56 @@
+[
+    {
+        "id": "lab-1",
+        "numOfStudents": 4,
+        "numOfSolutions": 3,
+        "results": [
+            {"username": "test1",
+             "name": "ivo ivic",
+             "id": "00001",
+             "lang": "py",
+             "score": "30/30 (100%)"},
+            {"username": "test2",
+             "name": "ana anic",
+             "id": "00002",
+             "lang": "cpp",
+             "score": "30/30 (100%)"},
+            {"username": "test3",
+             "name": "jure juric",
+             "id": "00003",
+             "lang": "py",
+             "score": "30/30 (100%)"},
+            {"username": "test4",
+             "name": "mate matic",
+             "id": "00004",
+             "lang": null,
+             "score": null}
+        ]
+    },
+    {
+        "id": "lab-2",
+        "numOfStudents": 4,
+        "numOfSolutions": 3,
+        "results": [
+            {"username": "test11",
+             "name": "ivo ivic",
+             "id": "00001",
+             "lang": "py",
+             "score": "30/30 (100%)"},
+            {"username": "test2",
+             "name": "ana anic",
+             "id": "00002",
+             "lang": "cpp",
+             "score": "30/30 (100%)"},
+            {"username": "test3",
+             "name": "jure juric",
+             "id": "00003",
+             "lang": "py",
+             "score": "30/30 (100%)"},
+            {"username": "test4",
+             "name": "mate matic",
+             "id": "00004",
+             "lang": null,
+             "score": null}
+        ]
+    }
+]

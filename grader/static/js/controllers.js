@@ -8,14 +8,15 @@ var sandwormControllers = angular.module('sandwormControllers', [
     'ngResource',
     'ngCookies',
 ])
-/** LabCtrl @description displays labs */
-.controller('LabCtrl', ['LabService', function(LabService) {
+/* Admin controllers */
+/** AdminLabCtrl @description displays labs */
+.controller('AdminLabCtrl', ['AdminLabService', function(LabService) {
     var self = this;
     var now = Date.now();
     self.labs = LabService.query(function(labs) {
-        labs = angular.forEach(labs, function(lab) {
-            lab.isOver = lab.end < now;
-        });
+        // labs = angular.forEach(labs, function(lab) {
+        //     lab.isOver = lab.end < now;
+        // });
     });
     self.lab = {
         name: '',
@@ -27,22 +28,36 @@ var sandwormControllers = angular.module('sandwormControllers', [
         console.log('Submit with ', self.lab);
     };
 }])
+/** LabResultsCtrl @description displays lab details for admin */
+.controller('AdminLabDetailsCtrl', ['$stateParams', 'AdminLabService',
+                                    function($stateParams, AdminLabService) {
+    var self = this;
+    self.lab = AdminLabService.get({labId: $stateParams.labId}, function(lab) {});
+}])
+/** AdminResultsCtrl @description displays all results on admin pages */
+.controller('AdminResultsCtrl', ['$stateParams', 'AdminResultsService',
+                                 function($stateParams, AdminResultsService) {
+    var self = this;
+    self.results = AdminResultsService.query();
+}])
+
+/* User controllers */
+/** LabCtrl @description displays labs */
+.controller('LabCtrl', ['LabService', function(LabService) {
+    var self = this;
+    var now = Date.now();
+    self.labs = LabService.query(function(labs) {
+        labs = angular.forEach(labs, function(lab) {
+            lab.isOver = lab.end < now;
+        });
+    });
+}])
 /** LabDetailsCtrl @description displays lab details */
 .controller('LabDetailsCtrl', ['$stateParams', 'LabService', function($stateParams, LabService) {
     var self = this;
     self.lab = LabService.get({labId: $stateParams.labId}, function(lab) {
         lab.isOver = lab.end < Date.now();
     });
-}])
-/** LabResultsCtrl @description displays lab details for admin */
-.controller('AdminLabDetailsCtrl', ['$stateParams', 'LabResultsService', function($stateParams, LabResultsService) {
-    var self = this;
-    self.lab = LabResultsService.get({labId: $stateParams.labId}, function(lab) {});
-}])
-/** AdminResultsCtrl @description displays all results on admin pages */
-.controller('AdminResultsCtrl', ['$stateParams', 'AdminResultsService', function($stateParams, AdminResultsService) {
-    var self = this;
-    self.results = AdminResultsService.query();
 }])
 .controller('LoginCtrl', ['UserService', '$state', function(UserService, $state) {
     var self = this;

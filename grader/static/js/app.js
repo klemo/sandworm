@@ -87,7 +87,7 @@ var sandworm = angular.module('sandworm', [
             },
             'uir-view-content': {
                 templateUrl: 'static/views/admin_labs.html',
-                controller: 'LabCtrl as labCtrl'}
+                controller: 'AdminLabCtrl as labCtrl'}
         }
     }).state('admin-lab', {
         url: '/admin/labs/:labId',

@@ -35,6 +35,8 @@ class Application(tornado.web.Application):
             (r'/', MainHandler),
             (r'/api/v1/labs$', LabHandler),
             (r'/api/v1/labs/(.+)', LabHandler),
+            (r'/api/v1/admin/labs$', AdminLabHandler),
+            (r'/api/v1/admin/labs/(.+)', AdminLabHandler),
             (r'/api/v1/login', LoginHandler),
             (r'/api/v1/logout', LogoutHandler),
             (r'/api/v1/user', UserHandler)
@@ -96,6 +98,21 @@ class MainHandler(BaseHandler):
     def get(self):
         self.xsrf_token
         self.render('index.html')
+
+#------------------------------------------------------------------------------
+
+class AdminLabHandler(BaseHandler):
+
+    @utils.auth('admin')
+    def get(self, lab_id=None):
+        if lab_id:
+            # get specific lab with results
+            lab = db.get_admin_labs(self.application.db, lab_id)
+            utils.jsonify(self, lab)
+        else:
+            # get list of all labs
+            labs = db.get_admin_labs(self.application.db)
+            utils.jsonify(self, list(labs))
 
 #------------------------------------------------------------------------------
 
