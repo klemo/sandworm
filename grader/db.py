@@ -33,17 +33,42 @@ def login_user(db, logindata):
 #------------------------------------------------------------------------------
 
 def get_admin_labs(db, lab_id=None):
+    '''
+    Returns list of labs for admin role (or single lab with lab_id)
+    '''
     # return all labs
     if not lab_id:
         return list(db.labs.find({}))
     # return lab_id details with results
     lab = db.labs.find_one({'id': lab_id})
     results = db.results.find_one({'id': lab_id})
-    lab.update(results)
+    if results:
+        lab.update(results)
     return lab
 
+#------------------------------------------------------------------------------
+
 def get_admin_all_results(db):
+    '''
+    Return all results calculated in batch
+    '''
     return db.all_results.find_one()
+
+#------------------------------------------------------------------------------
+
+def save_admin_lab(db, lab):
+    '''
+    Create new lab
+    '''
+    # todo: validate data
+    print lab
+    # todo: better slug...
+    lab['id'] = lab['name'].lower().replace(' ', '-')
+    try:
+        db.labs.insert(lab)
+    except Exception as e:
+        return None, 'could not save lab'
+    return lab, ''
 
 #------------------------------------------------------------------------------
 # User API

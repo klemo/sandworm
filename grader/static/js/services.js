@@ -33,7 +33,7 @@ var sandwormServices = angular.module('sandwormServices', [
 
 /* User services */
 /** LabService @returns list of labs */
-    .factory('LabService', ['$resource', 'API', function($resource, API) {
+.factory('LabService', ['$resource', 'API', function($resource, API) {
     return $resource(API.user + '/labs/:labId', {}, {
         query: {method: 'GET',
                 params: {labId: ''},

@@ -8,32 +8,53 @@ var sandwormControllers = angular.module('sandwormControllers', [
     'ngResource',
     'ngCookies',
 ])
+
 /* Admin controllers */
 /** AdminLabCtrl @description displays labs */
 .controller('AdminLabCtrl', ['AdminLabService', function(LabService) {
     var self = this;
-    var now = Date.now();
-    self.labs = LabService.query(function(labs) {
-        // labs = angular.forEach(labs, function(lab) {
-        //     lab.isOver = lab.end < now;
-        // });
-    });
+    self.labs = LabService.query();
+    /* JS Date helpers */
+    var _n = new Date();
+    var now = new Date(_n.getFullYear(), _n.getMonth(), _n.getDate());
+
+    var plusMonth = function(t) {
+        return new Date(t.getFullYear(), t.getMonth() + 1, t.getDate());
+    };
+    
+    /* Handle form data */
     self.lab = {
-        name: '',
-        desc: '',
-        start: new Date(),
-        end: new Date()
+        name: 'Test lab 3',
+        desc: 'test description',
+        start: now,
+        end: plusMonth(now)
+    };
+    self.updateEnd = function() {
+        if (self.lab.start) {
+            self.lab.end = plusMonth(self.lab.start);
+        }
     };
     self.submit = function() {
-        console.log('Submit with ', self.lab);
+        LabService.save({labId: ''}, self.lab).$promise.then(
+            function(lab) {
+                //self.labs.push(lab);
+                self.labs = LabService.query();
+                self.errorMessage = 'Lab created';
+            },
+            function(err) {
+                self.errorMessage = err;
+            });
     };
 }])
+
 /** LabResultsCtrl @description displays lab details for admin */
 .controller('AdminLabDetailsCtrl', ['$stateParams', 'AdminLabService',
                                     function($stateParams, AdminLabService) {
     var self = this;
-    self.lab = AdminLabService.get({labId: $stateParams.labId}, function(lab) {});
+    self.lab = AdminLabService.get({labId: $stateParams.labId},
+                                   function(lab) {});
 }])
+
 /** AdminResultsCtrl @description displays all results on admin pages */
 .controller('AdminResultsCtrl', ['$stateParams', 'AdminResultsService',
                                  function($stateParams, AdminResultsService) {

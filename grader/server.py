@@ -115,6 +115,15 @@ class AdminLabHandler(BaseHandler):
     def get(self, lab_id=None):
         utils.jsonify(self, db.get_admin_labs(self.application.db, lab_id))
 
+    def post(self, lab_id=None):
+        postdata = json.loads(self.request.body)
+        lab, err = db.save_admin_lab(self.application.db, postdata)
+        if lab:
+            utils.jsonify(self, lab)
+        else:
+            self.set_status(400)
+            utils.jsonify(self, {'code': 'save-failed', 'err': err})
+
 #------------------------------------------------------------------------------
 
 class AdminResultsHandler(BaseHandler):
