@@ -45,11 +45,10 @@ var sandwormControllers = angular.module('sandwormControllers', [
 /** LabCtrl @description displays labs */
 .controller('LabCtrl', ['LabService', function(LabService) {
     var self = this;
-    var now = Date.now();
+    //var now = angular.toJson(new Date());
     self.labs = LabService.query(function(labs) {
         labs = angular.forEach(labs, function(lab) {
-            // console.log(lab.end, now);
-            // lab.isOver = angular.fromJson(lab.end) < now;
+            //lab.isOver = lab.end < now;
         });
     });
 }])
@@ -57,7 +56,7 @@ var sandwormControllers = angular.module('sandwormControllers', [
 .controller('LabDetailsCtrl', ['$stateParams', 'LabService', function($stateParams, LabService) {
     var self = this;
     self.lab = LabService.get({labId: $stateParams.labId}, function(lab) {
-        lab.isOver = lab.end < Date.now();
+        //lab.isOver = lab.end < Date.now();
     });
 }])
 .controller('LoginCtrl', ['UserService', '$state', function(UserService, $state) {

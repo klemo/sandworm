@@ -68,4 +68,9 @@ def get_labs(db, user, lab_id=None):
             lab['submitted'] = get_user_lab(lab['id']) or False
         return labs
 
-    return None
+    # return lab_id details with results
+    lab = db.labs.find_one({'id': lab_id})
+    results = db.user_results.find_one({'id': lab_id,
+                                        'username': user['username']})
+    lab.update(results)
+    return lab

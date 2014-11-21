@@ -53,7 +53,7 @@ def connect_to_mongo(env):
 
 #------------------------------------------------------------------------------
 
-def load_fixtures(collections=['users', 'labs', 'results']):
+def load_fixtures(collections=['users', 'labs', 'results', 'user_results']):
     '''
     Loads fixture data to db (users...)
     '''
@@ -63,7 +63,7 @@ def load_fixtures(collections=['users', 'labs', 'results']):
         print(' adding {}'.format(c))
         db[c].drop()
         with open('test/fixtures/{}.json'.format(c), 'r') as f:
-            items = json.loads(f.read())
+            items = json_util.loads(f.read())
             for i in items:
                 db[c].insert(i)
 

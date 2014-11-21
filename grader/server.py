@@ -113,8 +113,9 @@ class LabHandler(BaseHandler):
 
     @utils.auth('user')
     def get(self, lab_id=None):
-        utils.jsonify(self, db.get_labs(
-                self.application.db, self.get_current_user()))
+        utils.jsonify(self, db.get_labs(self.application.db,
+                                        self.get_current_user(),
+                                        lab_id))
         
 #------------------------------------------------------------------------------
         
