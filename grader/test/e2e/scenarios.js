@@ -90,16 +90,32 @@ describe('Sandowrm App', function() {
             expect(labList.count()).toBe(2);
         });
 
+        it('should create new lab', function() {
+            element(by.css('.btn.btn-primary')).click();
+            expect(element(by.css('.alert-success')).isDisplayed())
+                .toBe(true);
+            var labList = element.all(by.repeater('lab in labCtrl.labs'));
+            expect(labList.count()).toBe(3);
+        });
+
         describe('Lab details', function() {
             
             beforeEach(function() {
-                browser.driver.get(baseUrl + 'admin/labs/lab-1');
+                browser.driver.get(baseUrl + 'admin/labs/lab-3');
             });
 
             it('should display lab details page', function() {    
-                expect(element(by.binding('ctrl.lab.name')).getText()).toBe('LAB1');
+                expect(element(by.binding('ctrl.lab.name')).getText()).toBe('LAB 3');
             });
+
+            it('should remove lab and redirect', function() {
+                browser.executeScript('window.confirm = function() {return true;}');
+                element(by.css('.remove-lab')).click();
+                expect(browser.getCurrentUrl()).toEqual(baseUrl + 'admin/labs');
+            });
+            
         });
+
 
         describe('All results', function() {
             

@@ -43,9 +43,9 @@
   
 </div>
 
-<div class="alert alert-danger" ng-bind="labCtrl.errorMessage" ng-show="labCtrl.errorMessage"></div>
+<div class="alert alert-danger" role="alert" ng-bind="labCtrl.errorMessage" ng-show="labCtrl.errorMessage"></div>
 
-<div class="alert alert-info" ng-bind="labCtrl.infoMessage" ng-show="labCtrl.infoMessage"></div>
+<div class="alert alert-success" role="alert" ng-bind="labCtrl.infoMessage" ng-show="labCtrl.infoMessage"></div>
 
 <div class="lab row" ng-repeat="lab in labCtrl.labs">
   <h2>

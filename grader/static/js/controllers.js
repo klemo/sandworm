@@ -14,6 +14,7 @@ var sandwormControllers = angular.module('sandwormControllers', [
 .controller('AdminLabCtrl', ['AdminLabService', function(LabService) {
     var self = this;
     self.labs = LabService.query();
+    
     /* JS Date helpers */
     var _n = new Date();
     var now = new Date(_n.getFullYear(), _n.getMonth(), _n.getDate());
@@ -24,7 +25,7 @@ var sandwormControllers = angular.module('sandwormControllers', [
     
     /* Handle form data */
     self.lab = {
-        name: 'Test lab 3',
+        name: 'LAB 3',
         desc: 'test description',
         start: now,
         end: plusMonth(now)
@@ -39,7 +40,7 @@ var sandwormControllers = angular.module('sandwormControllers', [
             function(lab) {
                 //self.labs.push(lab);
                 self.labs = LabService.query();
-                self.errorMessage = 'Lab created';
+                self.infoMessage = 'Lab created';
             },
             function(err) {
                 self.errorMessage = err;
@@ -48,11 +49,21 @@ var sandwormControllers = angular.module('sandwormControllers', [
 }])
 
 /** LabResultsCtrl @description displays lab details for admin */
-.controller('AdminLabDetailsCtrl', ['$stateParams', 'AdminLabService',
-                                    function($stateParams, AdminLabService) {
+.controller('AdminLabDetailsCtrl', ['$stateParams', 'AdminLabService', '$state', function($stateParams, LabService, $state) {
     var self = this;
-    self.lab = AdminLabService.get({labId: $stateParams.labId},
-                                   function(lab) {});
+    self.lab = LabService.get({labId: $stateParams.labId});
+    self.deleteLab = function() {
+        if (confirm('Remove this lab?')) {
+            LabService.remove({labId: $stateParams.labId}).$promise.then(
+                function(lab) {
+                    $state.go('admin-labs');
+                },
+                function(err) {
+                    self.errorMessage = err;
+                });
+        };
+    }
+    
 }])
 
 /** AdminResultsCtrl @description displays all results on admin pages */

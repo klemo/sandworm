@@ -115,6 +115,7 @@ class AdminLabHandler(BaseHandler):
     def get(self, lab_id=None):
         utils.jsonify(self, db.get_admin_labs(self.application.db, lab_id))
 
+    @utils.auth('admin')
     def post(self, lab_id=None):
         postdata = json.loads(self.request.body)
         lab, err = db.save_admin_lab(self.application.db, postdata)
@@ -123,6 +124,15 @@ class AdminLabHandler(BaseHandler):
         else:
             self.set_status(400)
             utils.jsonify(self, {'code': 'save-failed', 'err': err})
+
+    @utils.auth('admin')
+    def delete(self, lab_id=None):
+        try:
+            err = db.delete_admin_lab(self.application.db, lab_id)
+            utils.jsonify(self, True)
+        except Exception as e:
+            self.set_status(400)
+            utils.jsonify(self, {'code': 'delete-failed', 'err': e})    
 
 #------------------------------------------------------------------------------
 

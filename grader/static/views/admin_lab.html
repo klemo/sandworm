@@ -13,7 +13,7 @@
   <p class="lead description">{{ctrl.lab.desc}}</p>
 
   <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-10">
       Kraj: <span ng-class="{'label label-danger': ctrl.lab.isOver,
                             'label label-success': !ctrl.lab.isOver}">{{ctrl.lab.end | date:'dd. MM. yyyy HH:mm:ss'}}</span>
       <span ng-show="lab.published" class="label label-success">Rezultati SU OBJAVLJENI studentima</span>
@@ -21,10 +21,13 @@
       <button ng-show="lab.published" type="button" class="btn btn-default btn-xs">Sakrij rezultate</button>
       <button ng-show="!lab.published" type="button" class="btn btn-default btn-xs">Objavi rezultate</button>
     </div>
-    <div class="col-md-4">
-      <button type="button" class="btn btn-primary pull-right">Uredi</button>
+    <div class="col-md-2">
+      <button type="button" class="btn btn-primary btn-xs edit-lab">Uredi</button>
+      <button type="button" class="btn btn-danger btn-xs remove-lab" ng-click="ctrl.deleteLab()">Obriši</button>
     </div>
   </div>
+
+  <div class="alert alert-danger" role="alert" ng-bind="ctrl.errorMessage" ng-show="ctrl.errorMessage"></div>
 
   <div class="row">
     <button type="button" class="btn btn-default">Pokreni testove</button>
