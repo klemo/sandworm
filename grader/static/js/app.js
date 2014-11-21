@@ -123,27 +123,28 @@ var sandworm = angular.module('sandworm', [
     $urlRouterProvider.when('/admin', '/admin/labs');
     $urlRouterProvider.otherwise('/');
     
-}).run(['$rootScope', '$location', '$http', '$cookies', '$state', 'UserService',
-        function($rootScope, $location, $http, $cookies, $state, UserService) {
+}).run(['$rootScope', '$location', '$http', '$cookies', '$state', '$q', 'UserService',
+        function($rootScope, $location, $http, $cookies, $state, $q, UserService) {
 
     /* set xsrf header */
     $http.defaults.headers.post['X-XSRFToken'] = $cookies['_xsrf'];
 
-    UserService.user();
-
     $rootScope.$on('$stateChangeStart', function (event, next) {
         /* prevent user from navigating to non-authorized or private resource
          * warn: client-side only! */
-        if (UserService.isLoggedIn) {
-            if (next.data.access !== '*' && next.data.access !== UserService.currentUser.role) {
-                event.preventDefault();
-            }
-        } else {
-            if (!next.data.isPublic) {
-                event.preventDefault();
-                $state.go('login');
-            }
-        }
+        var evv = event;
+        UserService.user().then(
+            function(success) {
+                if (next.data.access !== '*' && next.data.access !== UserService.currentUser.role) {
+                    $state.go('index');
+                }
+            },
+            function(err) {
+                if (!next.data.isPublic) {
+                    $state.go('login');
+                }
+                return $q.reject(err);
+            });
     });
     
 }]);

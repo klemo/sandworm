@@ -17,7 +17,7 @@ def jsonify(req, data):
 
 #------------------------------------------------------------------------------
 
-def auth(role='user'):
+def auth(role=None):
     def authenticate(method):
         '''
         Custom auth handler
@@ -28,7 +28,7 @@ def auth(role='user'):
                 self.set_status(400)
                 jsonify(self, {'error': 'not authenticated'})
                 return
-            if self.current_user['role'] <> role:
+            if role and self.current_user['role'] <> role:
                 jsonify(self, {'error': 'not authorized'})
                 return
             return method(self, *args, **kwargs)

@@ -50,7 +50,7 @@ describe('Sandowrm App', function() {
 
         it('should prevent navigating to nonauthorized resource', function() {
             browser.driver.get(baseUrl + 'admin/labs/lab-1');
-            expect(browser.getCurrentUrl()).toEqual(baseUrl + 'labs/lab-1');
+            expect(browser.getCurrentUrl()).toEqual(baseUrl + 'labs');
         });
 
         it('should sign out current user', function() {
