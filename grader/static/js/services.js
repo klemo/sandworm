@@ -40,14 +40,6 @@ var sandwormServices = angular.module('sandwormServices', [
                 isArray: true}
     });
 }])
-/** LabResultsService @returns results for given lab */
-.factory('LabResultsService', ['$resource', function($resource) {
-    return $resource('static/api/labs/:labId/results.json', {}, {
-        query: {method: 'GET',
-                params: {labId: 'labs'},
-                isArray: true}
-    });
-}])
 /** UserService @description deals with user authentication */
 .factory('UserService', ['$http', function($http) {
     var service = {
