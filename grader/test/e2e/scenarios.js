@@ -101,6 +101,18 @@ describe('Sandowrm App', function() {
             });
         });
 
+        describe('All results', function() {
+            
+            beforeEach(function() {
+                browser.driver.get(baseUrl + 'admin/results');
+            });
+
+            it('should display all results page', function() {
+                var labList = element.all(by.repeater('lab in ctrl.results.labs'));
+                expect(labList.count()).toBe(4);
+            });
+        });
+
         it('should sign out current user', function() {
             browser.driver.get(baseUrl);
             element(by.css('.signout-link')).click();

@@ -42,6 +42,9 @@ def get_admin_labs(db, lab_id=None):
     lab.update(results)
     return lab
 
+def get_admin_all_results(db):
+    return db.all_results.find_one()
+
 #------------------------------------------------------------------------------
 # User API
 #------------------------------------------------------------------------------

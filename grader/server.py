@@ -32,14 +32,18 @@ class Application(tornado.web.Application):
 
     def __init__(self, options):
         handlers = [
+            # Public API
             (r'/', MainHandler),
-            (r'/api/v1/labs$', LabHandler),
-            (r'/api/v1/labs/(.+)', LabHandler),
-            (r'/api/v1/admin/labs$', AdminLabHandler),
-            (r'/api/v1/admin/labs/(.+)', AdminLabHandler),
             (r'/api/v1/login', LoginHandler),
             (r'/api/v1/logout', LogoutHandler),
-            (r'/api/v1/user', UserHandler)
+            (r'/api/v1/user', UserHandler),
+            # User API
+            (r'/api/v1/labs$', LabHandler),
+            (r'/api/v1/labs/(.+)', LabHandler),
+            # Admin API
+            (r'/api/v1/admin/labs$', AdminLabHandler),
+            (r'/api/v1/admin/labs/(.+)', AdminLabHandler),
+            (r'/api/v1/admin/results', AdminResultsHandler),
             ]
         env = dict(
             template_path=os.path.join(
@@ -60,6 +64,8 @@ class BaseHandler(tornado.web.RequestHandler):
         username = self.get_secure_cookie('username')
         return db.get_user(self.application.db, username)
 
+#------------------------------------------------------------------------------
+# Public API
 #------------------------------------------------------------------------------
     
 class LoginHandler(BaseHandler):
@@ -85,14 +91,6 @@ class LogoutHandler(BaseHandler):
 
 #------------------------------------------------------------------------------
 
-class UserHandler(BaseHandler):
-
-    @utils.auth()
-    def get(self):
-        utils.jsonify(self, self.get_current_user())
-
-#------------------------------------------------------------------------------
-
 class MainHandler(BaseHandler):
 
     def get(self):
@@ -101,6 +99,16 @@ class MainHandler(BaseHandler):
 
 #------------------------------------------------------------------------------
 
+class UserHandler(BaseHandler):
+
+    @utils.auth()
+    def get(self):
+        utils.jsonify(self, self.get_current_user())
+
+#------------------------------------------------------------------------------
+# Admin API
+#------------------------------------------------------------------------------
+        
 class AdminLabHandler(BaseHandler):
 
     @utils.auth('admin')
@@ -109,6 +117,16 @@ class AdminLabHandler(BaseHandler):
 
 #------------------------------------------------------------------------------
 
+class AdminResultsHandler(BaseHandler):
+
+    @utils.auth('admin')
+    def get(self):
+        utils.jsonify(self, db.get_admin_all_results(self.application.db))
+
+#------------------------------------------------------------------------------
+# User API
+#------------------------------------------------------------------------------
+        
 class LabHandler(BaseHandler):
 
     @utils.auth('user')

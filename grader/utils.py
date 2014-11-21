@@ -53,11 +53,12 @@ def connect_to_mongo(env):
 
 #------------------------------------------------------------------------------
 
-def load_fixtures(collections=['users', 'labs', 'results', 'user_results']):
+def load_fixtures():
     '''
     Loads fixture data to db (users...)
     '''
     print('Load fixtures')
+    collections = ['users', 'labs', 'results', 'user_results', 'all_results']
     db = connect_to_mongo(settings.ENV)
     for c in collections:
         print(' adding {}'.format(c))
