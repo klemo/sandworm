@@ -47,7 +47,7 @@
 
 <div class="alert alert-success" role="alert" ng-bind="labCtrl.infoMessage" ng-show="labCtrl.infoMessage"></div>
 
-<div class="lab row" ng-repeat="lab in labCtrl.labs">
+<div class="lab row" ng-repeat="lab in labCtrl.labs | orderBy:'-end'">
   <h2>
     <a href="#/admin/labs/{{lab.id}}">{{lab.name}}</a>
   </h2>
