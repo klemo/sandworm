@@ -85,11 +85,25 @@ var sandwormControllers = angular.module('sandwormControllers', [
     });
 }])
 /** LabDetailsCtrl @description displays lab details */
-.controller('LabDetailsCtrl', ['$stateParams', 'LabService', function($stateParams, LabService) {
+.controller('LabDetailsCtrl', ['$stateParams', 'LabService', 'FileUploader', function($stateParams, LabService, FileUploader) {
     var self = this;
     self.lab = LabService.get({labId: $stateParams.labId}, function(lab) {
         //lab.isOver = lab.end < Date.now();
     });
+    self.uploader = new FileUploader({'queueLimit': 1});
+    self.uploader.filters.push({
+        name: 'zipFilter',
+        fn: function(item /*{File|FileLikeObject}*/, options) {
+            var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+            return '|zip|'.indexOf(type) !== -1;
+        }
+    });
+    self.uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
+        self.errorMessage = 'File must be zip archive!';
+    };
+    self.uploader.onAfterAddingFile = function(fileItem) {
+        self.errorMessage = '';
+    };
 }])
 .controller('LoginCtrl', ['UserService', '$state', function(UserService, $state) {
     var self = this;

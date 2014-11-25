@@ -7,6 +7,7 @@ var sandworm = angular.module('sandworm', [
     'ui.router',
     'ngResource',
     'ngCookies',
+    'angularFileUpload',
     'sandwormServices',
     'sandwormControllers'
 ]).config(function($stateProvider, $urlRouterProvider) {
