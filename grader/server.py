@@ -14,6 +14,7 @@ import tornado.escape
 from tornado.options import define, options
 # application imports
 import os.path
+import uuid
 import pymongo
 import simplejson as json
 import urllib
@@ -153,6 +154,21 @@ class LabHandler(BaseHandler):
         utils.jsonify(self, db.get_labs(self.application.db,
                                         self.get_current_user(),
                                         lab_id))
+
+    @utils.auth('user')
+    def post(self):
+        filepost = self.request.files.get('file')
+        if not filepost:
+            utils.jsonify(self, False)
+        fileinfo = filepost[0]
+        fname = fileinfo['filename']
+        ext = os.path.splitext(fname)[1]
+        name = str(uuid.uuid4()) + ext
+        if not os.path.exists(settings.UPLOAD_DIR):
+            os.makedirs(settings.UPLOAD_DIR)
+        with open(os.path.join(settings.UPLOAD_DIR, name), 'wb') as f:
+            f.write(fileinfo['body'])
+        utils.jsonify(self, True)
         
 #------------------------------------------------------------------------------
         

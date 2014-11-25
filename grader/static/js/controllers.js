@@ -85,21 +85,31 @@ var sandwormControllers = angular.module('sandwormControllers', [
     });
 }])
 /** LabDetailsCtrl @description displays lab details */
-.controller('LabDetailsCtrl', ['$stateParams', 'LabService', 'FileUploader', function($stateParams, LabService, FileUploader) {
+.controller('LabDetailsCtrl', ['$stateParams', 'LabService', 'FileUploader', '$cookies', function($stateParams, LabService, FileUploader, $cookies) {
     var self = this;
     self.lab = LabService.get({labId: $stateParams.labId}, function(lab) {
         //lab.isOver = lab.end < Date.now();
     });
-    self.uploader = new FileUploader({'queueLimit': 1});
-    self.uploader.filters.push({
-        name: 'zipFilter',
-        fn: function(item /*{File|FileLikeObject}*/, options) {
-            var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
-            return '|zip|'.indexOf(type) !== -1;
-        }
+    self.uploader = new FileUploader({
+        url: '/api/v1/labs',
+        method: 'post',
+        queue: [],
+        headers: {'X-XSRFToken': $cookies['_xsrf']}
     });
+    // self.uploader.filters.push({
+    //     name: 'zipFilter',
+    //     fn: function(item /*{File|FileLikeObject}*/, options) {
+    //         var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+    //         return '|zip|'.indexOf(type) !== -1;
+    //     }
+    // });
     self.uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
-        self.errorMessage = 'File must be zip archive!';
+        if (filter.name === 'queueLimit') {
+            //self.uploader.clearQueue();
+            //self.uploader.addToQueue( );
+        } else if (filter.name === 'queueLimit') {
+            self.errorMessage = 'File must be zip archive!';
+        };
     };
     self.uploader.onAfterAddingFile = function(fileItem) {
         self.errorMessage = '';
