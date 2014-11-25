@@ -9,6 +9,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import tornado.websocket
 import tornado.auth
 import tornado.escape
 from tornado.options import define, options
@@ -16,6 +17,7 @@ from tornado.options import define, options
 import os.path
 import uuid
 import pymongo
+import pika
 import simplejson as json
 import urllib
 import settings
@@ -41,6 +43,7 @@ class Application(tornado.web.Application):
             # User API
             (r'/api/v1/labs$', LabHandler),
             (r'/api/v1/labs/(.+)', LabHandler),
+            (r'/api/v1/submitlabstatus', SubmitLabHandler),
             # Admin API
             (r'/api/v1/admin/labs$', AdminLabHandler),
             (r'/api/v1/admin/labs/(.+)', AdminLabHandler),
@@ -169,12 +172,36 @@ class LabHandler(BaseHandler):
         with open(os.path.join(settings.UPLOAD_DIR, name), 'wb') as f:
             f.write(fileinfo['body'])
         utils.jsonify(self, True)
+
+#------------------------------------------------------------------------------
+
+WSUSERS = []
         
+class SubmitLabHandler(tornado.websocket.WebSocketHandler):
+
+    def open(self, *args):
+        print('open', 'WebSocketChatHandler', self)
+        WSUSERS.append(self)
+
+    def on_message(self, message):
+        print message
+        for client in WSUSERS:
+            WSUSERS.write_message(message)
+        
+    def on_close(self):
+        clients.remove(self)
+
 #------------------------------------------------------------------------------
         
 if __name__ == '__main__':
     tornado.options.parse_command_line()
     settings.ENV = settings.SERVER[options.env]
-    http_server = tornado.httpserver.HTTPServer(Application(options))
+    application = Application(options)
+    http_server = tornado.httpserver.HTTPServer(application)
+    io_loop = tornado.ioloop.IOLoop.instance()    
+    # setup PikaClient for rabbitmq
+    #application.pika_client = pika.PikaClient(io_loop)
+    #application.pika_client.connect()
+    # start serving and ioloop
     http_server.listen(settings.ENV['port'])
-    tornado.ioloop.IOLoop.instance().start()
+    io_loop.start()
