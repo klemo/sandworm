@@ -199,9 +199,6 @@ if __name__ == '__main__':
     application = Application(options)
     http_server = tornado.httpserver.HTTPServer(application)
     io_loop = tornado.ioloop.IOLoop.instance()    
-    # setup PikaClient for rabbitmq
-    application.pika_client = mq.PikaClient(io_loop)
-    application.pika_client.connect()
-    # start serving and ioloop
+    application.q = mq.PikaClient(settings.QUEUE)
     http_server.listen(settings.ENV['port'])
     io_loop.start()
