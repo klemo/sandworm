@@ -17,12 +17,12 @@ from tornado.options import define, options
 import os.path
 import uuid
 import pymongo
-import pika
 import simplejson as json
 import urllib
 import settings
 import utils
 import db
+import mq
 import creds
 
 #------------------------------------------------------------------------------
@@ -200,8 +200,8 @@ if __name__ == '__main__':
     http_server = tornado.httpserver.HTTPServer(application)
     io_loop = tornado.ioloop.IOLoop.instance()    
     # setup PikaClient for rabbitmq
-    #application.pika_client = pika.PikaClient(io_loop)
-    #application.pika_client.connect()
+    application.pika_client = mq.PikaClient(io_loop)
+    application.pika_client.connect()
     # start serving and ioloop
     http_server.listen(settings.ENV['port'])
     io_loop.start()
