@@ -99,6 +99,7 @@ class MainHandler(BaseHandler):
 
     def get(self):
         self.xsrf_token
+        self.application.q_out.publish_message()
         self.render('index.html')
 
 #------------------------------------------------------------------------------
@@ -199,6 +200,7 @@ if __name__ == '__main__':
     application = Application(options)
     http_server = tornado.httpserver.HTTPServer(application)
     io_loop = tornado.ioloop.IOLoop.instance()    
-    application.q = mq.PikaClient(settings.QUEUE)
+    application.q = mq.QConsumer(settings.QUEUE_IN)
+    application.q_out = mq.QProducer(settings.QUEUE_OUT)
     http_server.listen(settings.ENV['port'])
     io_loop.start()

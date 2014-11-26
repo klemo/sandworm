@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
 
-QUEUE = 'sandworm-q0'
+QUEUE_OUT = 'sandworm-q-out'
+QUEUE_IN = 'sandworm-q-in'
 
 UPLOAD_DIR = 'tmp'
 
