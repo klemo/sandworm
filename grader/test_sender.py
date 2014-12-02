@@ -5,7 +5,7 @@ QUEUE = 'sandworm-q-in'
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(host='localhost'))
 channel = connection.channel()
-channel.queue_declare(queue=QUEUE)
+channel.queue_declare(queue=QUEUE, durable=True)
 message = 'hello world'
 properties = pika.BasicProperties(app_id='test_sender',
                                   content_type='text')

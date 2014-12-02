@@ -53,7 +53,7 @@ class QConsumer(object):
 
     def on_exchange_declareok(self, unused_frame):
         LOGGER.info('QConsumer: Exchange declared')
-        self._channel.queue_declare(self.on_queue_declareok, self.queue)
+        self._channel.queue_declare(self.on_queue_declareok, self.queue, durable=True)
 
     def on_queue_declareok(self, method_frame):
         LOGGER.info('QConsumer: Binding %s to %s with %s',
@@ -124,21 +124,16 @@ class QConsumer(object):
 #------------------------------------------------------------------------------
 
 class QProducer(object):
+    '''
+    Async pika/rabbitmq sender
+    '''
 
     def __init__(self, queue, url='amqp://guest:guest@localhost:5672/%2F'):
-        self.exchange = 'message'
-        self.exchange_type = 'topic'
-        self.publish_interval = 1
-        self.queue = queue
-        self.routing_key = self.queue
+        self._queue = queue
+        self._url = url
         self._connection = None
         self._channel = None
-        self._deliveries = []
-        self._acked = 0
-        self._nacked = 0
-        self._message_number = 0
         self._stopping = False
-        self._url = url
         self._closing = False
         # connect to rabbit mq
         self._connection = self.connect()
@@ -151,59 +146,27 @@ class QProducer(object):
     def on_connection_open(self, unused_connection):
         LOGGER.info('QProducer: Connection opened')
         self._connection.add_on_close_callback(self.on_connection_closed)
-        self.open_channel()
-
-    def open_channel(self):
-        LOGGER.info('QProducer: Creating a new channel')
         self._connection.channel(on_open_callback=self.on_channel_open)
 
     def on_channel_open(self, channel):
         LOGGER.info('QProducer: Channel opened')
         self._channel = channel
         self._channel.add_on_close_callback(self.on_channel_closed)
-        self._channel.exchange_declare(self.on_exchange_declareok,
-                                       self.exchange,
-                                       self.exchange_type)
-
-    def on_exchange_declareok(self, unused_frame):
-        LOGGER.info('QProducer: Exchange declared')
-        self._channel.queue_declare(self.on_queue_declareok, self.queue)
-
-    def on_queue_declareok(self, method_frame):
-        LOGGER.info('QProducer: Binding %s to %s with %s',
-                    self.exchange, self.queue, self.routing_key)
-        self._channel.queue_bind(self.on_bindok, self.queue,
-                                 self.exchange, self.routing_key)
-
-    def on_bindok(self, unused_frame):
-        LOGGER.info('QProducer: Queue bound')
-        #self._channel.confirm_delivery(self.on_delivery_confirmation)
-
-    def on_delivery_confirmation(self, method_frame):
-        confirmation_type = method_frame.method.NAME.split('.')[1].lower()
-        LOGGER.info('QProducer: Received %s for delivery tag: %i',
-                    confirmation_type,
-                    method_frame.method.delivery_tag)
-        if confirmation_type == 'ack':
-            self._acked += 1
-        elif confirmation_type == 'nack':
-            self._nacked += 1
-        #self._deliveries.remove(method_frame.method.delivery_tag)
-        LOGGER.info('QProducer: Published %i messages, %i have yet to be confirmed, '
-                    '%i were acked and %i were nacked',
-                    self._message_number, len(self._deliveries),
-                    self._acked, self._nacked)
+        self._channel.queue_declare(None, self._queue, durable=True)
 
     def publish_message(self):
         if self._stopping:
             return
-
         message = {'test': 'test'}
-        properties = pika.BasicProperties(app_id='example-publisher',
-                                          content_type='application/json',
-                                          headers=message)
+        properties = pika.BasicProperties(
+            app_id='example-publisher',
+            content_type='application/json',
+            headers=message,
+            delivery_mode = 2, # make message persistent
+            )
         msg = json.dumps(message, ensure_ascii=False)
-        self._channel.basic_publish(self.exchange, self.routing_key, msg, properties)
+        self._channel.basic_publish(exchange='', routing_key=self._queue,
+                                    body=msg, properties=properties)
         LOGGER.info('Published message # %s', msg)
 
     ##############
@@ -231,5 +194,3 @@ class QProducer(object):
         LOGGER.info('QProducer: Closing the channel')
         if self._channel:
             self._channel.close()
-
-    
