@@ -21,16 +21,11 @@ class QConsumer(object):
     '''
 
     def __init__(self, queue, url='amqp://guest:guest@localhost:5672/%2F'):
-        self.exchange = 'message'
-        self.exchange_type = 'topic'
-        self.queue = queue
-        self.routing_key = self.queue
+        self._queue = queue
         self._url = url
         self._connection = None
         self._channel = None
         self._closing = False
-        self._consumer_tag = None
-        # connect to rabbitmq
         self._connection = self.connect()
 
     def connect(self):
@@ -47,19 +42,16 @@ class QConsumer(object):
         LOGGER.info('QConsumer: Channel opened')
         self._channel = channel
         self._channel.add_on_close_callback(self.on_channel_closed)
-        self._channel.exchange_declare(self.on_exchange_declareok,
-                                       self.exchange,
-                                       self.exchange_type)
+        self._channel.queue_declare(None, self._queue, durable=True)
+        self._consumer_tag = self._channel.basic_consume(self.on_message,
+                                                         self._queue)
 
-    def on_exchange_declareok(self, unused_frame):
-        LOGGER.info('QConsumer: Exchange declared')
-        self._channel.queue_declare(self.on_queue_declareok, self.queue, durable=True)
+    def on_message(self, unused_channel, basic_deliver, properties, body):
+        LOGGER.info('QConsumer: Received message # %s from %s: %s',
+                    basic_deliver.delivery_tag, properties.app_id, body)
+        self._channel.basic_ack(basic_deliver.delivery_tag)
 
-    def on_queue_declareok(self, method_frame):
-        LOGGER.info('QConsumer: Binding %s to %s with %s',
-                    self.exchange, self.queue, self.routing_key)
-        self._channel.queue_bind(self.on_bindok, self.queue,
-                                 self.exchange, self.routing_key)
+    #######
 
     def on_connection_closed(self, connection, reply_code, reply_text):
         self._channel = None
@@ -92,11 +84,6 @@ class QConsumer(object):
             method_frame)
         if self._channel:
             self._channel.close()
-
-    def on_message(self, unused_channel, basic_deliver, properties, body):
-        LOGGER.info('QConsumer: Received message # %s from %s: %s',
-                    basic_deliver.delivery_tag, properties.app_id, body)
-        self._channel.basic_ack(basic_deliver.delivery_tag)
 
     def on_cancelok(self, unused_frame):
         LOGGER.info('QConsumer: RabbitMQ acknowledged the cancellation of the consumer')
@@ -135,7 +122,6 @@ class QProducer(object):
         self._channel = None
         self._stopping = False
         self._closing = False
-        # connect to rabbit mq
         self._connection = self.connect()
 
     def connect(self):
