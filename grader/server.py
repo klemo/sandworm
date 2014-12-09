@@ -15,15 +15,20 @@ import tornado.escape
 from tornado.options import define, options
 # application imports
 import os.path
-import uuid
 import pymongo
 import simplejson as json
-import urllib
+import logging
 import settings
 import utils
 import db
 import mq
 import creds
+
+#------------------------------------------------------------------------------
+
+LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
+              '-35s %(lineno) -5d: %(message)s')
+LOGGER = logging.getLogger(__name__)
 
 #------------------------------------------------------------------------------
 
@@ -99,7 +104,6 @@ class MainHandler(BaseHandler):
 
     def get(self):
         self.xsrf_token
-        self.application.q_out.publish_message()
         self.render('index.html')
 
 #------------------------------------------------------------------------------
@@ -133,11 +137,12 @@ class AdminLabHandler(BaseHandler):
     @utils.auth('admin')
     def delete(self, lab_id=None):
         try:
-            err = db.delete_admin_lab(self.application.db, lab_id)
+            db.delete_admin_lab(self.application.db, lab_id)
             utils.jsonify(self, True)
         except Exception as e:
+            LOGGER.error(e)
             self.set_status(400)
-            utils.jsonify(self, {'code': 'delete-failed', 'err': e})    
+            utils.jsonify(self, {'code': 'delete-failed', 'err': ''})
 
 #------------------------------------------------------------------------------
 
@@ -161,18 +166,14 @@ class LabHandler(BaseHandler):
 
     @utils.auth('user')
     def post(self):
-        filepost = self.request.files.get('file')
-        if not filepost:
-            utils.jsonify(self, False)
-        fileinfo = filepost[0]
-        fname = fileinfo['filename']
-        ext = os.path.splitext(fname)[1]
-        name = str(uuid.uuid4()) + ext
-        if not os.path.exists(settings.UPLOAD_DIR):
-            os.makedirs(settings.UPLOAD_DIR)
-        with open(os.path.join(settings.UPLOAD_DIR, name), 'wb') as f:
-            f.write(fileinfo['body'])
-        utils.jsonify(self, True)
+        user = self.get_current_user()
+        try:
+            user_archive_path = db.save_uploaded_archive(self.request, user)
+            db.submit_job(self.application, user_archive_path, user)
+            utils.jsonify(self, True)
+        except Exception as e:
+            LOGGER.error(e)
+            utils.jsonify(self, {'code': 'upload failed'})
 
 #------------------------------------------------------------------------------
 

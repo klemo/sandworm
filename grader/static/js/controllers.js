@@ -103,12 +103,12 @@ var sandwormControllers = angular.module('sandwormControllers', [
     //         return '|zip|'.indexOf(type) !== -1;
     //     }
     // });
-    self.uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
+    self.uploader.onWhenAddingFileFailed = function(item, filter, options) {
         if (filter.name === 'queueLimit') {
             //self.uploader.clearQueue();
             //self.uploader.addToQueue( );
-        } else if (filter.name === 'queueLimit') {
-            self.errorMessage = 'File must be zip archive!';
+        } else if (filter.name === 'zipFilter') {
+            self.errorMessage = 'Must be zip archive!';
         };
     };
     self.uploader.onAfterAddingFile = function(fileItem) {

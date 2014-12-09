@@ -2,8 +2,18 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
 
+import os.path
+import uuid
 import functools
 import simplejson as json
+import logging
+import settings
+
+#------------------------------------------------------------------------------
+
+LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
+              '-35s %(lineno) -5d: %(message)s')
+LOGGER = logging.getLogger(__name__)
 
 #------------------------------------------------------------------------------
 
@@ -113,3 +123,41 @@ def get_labs(db, user, lab_id=None):
                                         'username': user['username']})
     lab.update(results)
     return lab
+
+#------------------------------------------------------------------------------
+
+def save_uploaded_archive(request, user):
+    '''
+    Saves uploaded archive to specific folder and returns final archive path
+    '''
+    filepost = request.files.get('file')
+    fileinfo = filepost[0]
+    fname = fileinfo['filename']
+    ext = os.path.splitext(fname)[1]
+    # generate new unique name
+    archive_name = str(uuid.uuid4()) + ext
+    # dir path: UPLOAD_DIR/{{username}}/
+    user_archive_dir_path = os.path.join(settings.UPLOAD_DIR,
+                                         user['username'])
+    if not os.path.exists(user_archive_dir_path):
+        os.makedirs(user_archive_dir_path)
+    user_archive_path = os.path.join(user_archive_dir_path, archive_name)
+    with open(user_archive_path, 'wb') as f:
+        f.write(fileinfo['body'])
+    return user_archive_path
+
+#------------------------------------------------------------------------------
+
+def submit_job(application, archive_path, user):
+    '''
+    Submits user job to message queue
+    '''
+    LOGGER.info('Submitting {} for user {} to queue'.format(archive_path,
+                                                            user['username']))
+    message = {
+        'username': user['username'],
+        'archive_path': archive_path
+        }
+    application.q_out.publish_message(message)
+
+#------------------------------------------------------------------------------

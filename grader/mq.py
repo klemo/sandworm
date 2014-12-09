@@ -140,10 +140,9 @@ class QProducer(object):
         self._channel.add_on_close_callback(self.on_channel_closed)
         self._channel.queue_declare(None, self._queue, durable=True)
 
-    def publish_message(self):
+    def publish_message(self, message):
         if self._stopping:
             return
-        message = {'test': 'test'}
         properties = pika.BasicProperties(
             app_id='example-publisher',
             content_type='application/json',
