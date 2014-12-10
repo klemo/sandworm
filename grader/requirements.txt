@@ -2,5 +2,6 @@ requests
 simplejson
 tornado
 pymongo
+redis
 pika
 sockjs-tornado

@@ -90,19 +90,20 @@ var sandwormControllers = angular.module('sandwormControllers', [
     self.lab = LabService.get({labId: $stateParams.labId}, function(lab) {
         //lab.isOver = lab.end < Date.now();
     });
+    // Handle file uploading
     self.uploader = new FileUploader({
         url: '/api/v1/labs',
         method: 'post',
         queue: [],
         headers: {'X-XSRFToken': $cookies['_xsrf']}
     });
-    // self.uploader.filters.push({
-    //     name: 'zipFilter',
-    //     fn: function(item /*{File|FileLikeObject}*/, options) {
-    //         var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
-    //         return '|zip|'.indexOf(type) !== -1;
-    //     }
-    // });
+    self.uploader.filters.push({
+        name: 'zipFilter',
+        fn: function(item /*{File|FileLikeObject}*/, options) {
+            var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+            return '|zip|'.indexOf(type) !== -1;
+        }
+    });
     self.uploader.onWhenAddingFileFailed = function(item, filter, options) {
         if (filter.name === 'queueLimit') {
             //self.uploader.clearQueue();
@@ -114,6 +115,9 @@ var sandwormControllers = angular.module('sandwormControllers', [
     self.uploader.onAfterAddingFile = function(fileItem) {
         self.errorMessage = '';
     };
+
+    // Start sockjs connection and wait for messages
+    $socket.start();
 
     $socket.on('start', function(e, data){
         console.log('Received: ', data);

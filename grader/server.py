@@ -17,6 +17,7 @@ from tornado.options import define, options
 import sockjs.tornado
 import os.path
 import pymongo
+import redis
 import uuid
 import simplejson as json
 import logging
@@ -54,8 +55,8 @@ class Application(tornado.web.Application):
             (r'/api/v1/admin/labs$', AdminLabHandler),
             (r'/api/v1/admin/labs/(.+)', AdminLabHandler),
             (r'/api/v1/admin/results', AdminResultsHandler),
-            ] + sockjs.tornado.SockJSRouter(SubmitLabHandler,
-                                            '/api/v1/submitjob').urls
+            ] + SubmitLabRouter(SubmitLabHandler,
+                                '/api/v1/submitjob', self).urls
         env = dict(
             template_path=os.path.join(
                 os.path.dirname(__file__), 'templates'),
@@ -65,6 +66,7 @@ class Application(tornado.web.Application):
             xsrf_cookies=True,
             cookie_secret=creds.COOKIE_SECRET)
         self.db = utils.connect_to_mongo(settings.ENV)
+        #self.redis = utils.connect_to_redis(settings.ENV)
         tornado.web.Application.__init__(self, handlers, **env)
 
 #------------------------------------------------------------------------------
@@ -171,35 +173,39 @@ class LabHandler(BaseHandler):
         user = self.get_current_user()
         try:
             archive_path = db.save_uploaded_archive(self.request, user)
-            db.submit_job(self.application, archive_path, user)
+            job_id = db.submit_job(self.application, archive_path, user)
+            #self.db.jobs.insert({})
             utils.jsonify(self, True)
         except Exception as e:
             LOGGER.error(e)
             utils.jsonify(self, {'code': 'upload failed'})
 
 #------------------------------------------------------------------------------
-        
+
 class SubmitLabHandler(sockjs.tornado.SockJSConnection):
     '''
     Handles real-time async bidirectional connection for submitting labs for
     remote execution using EXEC system
     '''
 
-    # TODO this will probaby end up in Redis...
-    users = set()
-
     def on_open(self, *args):
         print('SockJS connection opened')
-        self.users.add(self)
+        self.session.server.application.q.add_listener(self)
 
     def on_message(self, message):
         print 'Received WS message: ', message
-        print 'Sending WS message: ', message
-        self.send(message)
+        # print 'Sending WS message: ', message
+        # self.send(message)
         
     def on_close(self):
-        self.users.remove(self)
+        self.session.server.application.q.remove_listener(self)
         print('SockJS connection closed')
+
+class SubmitLabRouter(sockjs.tornado.SockJSRouter):
+
+    def __init__(self, handler, url, application):
+        self.application = application
+        sockjs.tornado.SockJSRouter.__init__(self, handler, url)
 
 #------------------------------------------------------------------------------
         
@@ -209,7 +215,7 @@ if __name__ == '__main__':
     application = Application(options)
     http_server = tornado.httpserver.HTTPServer(application)
     io_loop = tornado.ioloop.IOLoop.instance()    
-    application.q = mq.QConsumer(settings.QUEUE_IN)
+    application.q = mq.QConsumer(settings.QUEUE_IN, on_msg=db.handle_job_event)
     application.q_out = mq.QProducer(settings.QUEUE_OUT)
     http_server.listen(settings.ENV['port'])
     io_loop.start()

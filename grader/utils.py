@@ -4,6 +4,7 @@
 
 import functools
 import pymongo
+import redis
 import argparse
 import simplejson as json
 from bson import json_util
@@ -49,6 +50,22 @@ def connect_to_mongo(env):
         return db
     except Exception as e:
         print('Mongo: ', e)
+    return None
+
+#------------------------------------------------------------------------------
+
+def connect_to_redis(env):
+    '''
+    Use this function to connect to redis
+    '''
+    try:
+        r = redis.StrictRedis(host='localhost',
+                              port=env['redisport'],
+                              db=0)
+        r.ping()
+        return r
+    except Exception as e:
+        print('Redis ', e)
     return None
 
 #------------------------------------------------------------------------------

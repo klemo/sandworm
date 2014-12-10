@@ -157,7 +157,5 @@ var sandworm = angular.module('sandworm', [
                 return $q.reject(err);
             });
     });
-
-    $socket.start();
     
 }]);

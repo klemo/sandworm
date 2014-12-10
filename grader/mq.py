@@ -20,12 +20,14 @@ class QConsumer(object):
     Async pika/rabbitmq receiver
     '''
 
-    def __init__(self, queue, url='amqp://guest:guest@localhost:5672/%2F'):
+    def __init__(self, queue, on_msg, url='amqp://guest:guest@localhost:5672/%2F'):
         self._queue = queue
         self._url = url
         self._connection = None
         self._channel = None
         self._closing = False
+        self._on_msg = on_msg
+        self._listeners = set()
         self._connection = self.connect()
 
     def connect(self):
@@ -49,7 +51,20 @@ class QConsumer(object):
     def on_message(self, unused_channel, basic_deliver, properties, body):
         LOGGER.info('QConsumer: Received message # %s from %s: %s',
                     basic_deliver.delivery_tag, properties.app_id, body)
+        # call custom on_msg func
+        self._on_msg(body, self._listeners)
         self._channel.basic_ack(basic_deliver.delivery_tag)
+
+    def add_listener(self, listener):
+        self._listeners.add(listener)
+        LOGGER.info('QConsumer: Added listener {}'.format(listener))
+
+    def remove_listener(self, listener):
+        try:
+            self._listeners.remove(listener)
+            LOGGER.info('QConsumer: Removed listener {}'.format(listener))
+        except KeyError:
+            pass
 
     #######
 

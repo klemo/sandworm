@@ -161,5 +161,15 @@ def submit_job(application, archive_path, user):
         'archive_path': archive_path
         }
     application.q_out.publish_message(message)
+    return job_id
 
 #------------------------------------------------------------------------------
+
+def handle_job_event(msg, listeners):
+    try:
+        content = json.loads(msg)
+        LOGGER.info('Handle job event: {}'.format(content))
+        for listener in listeners:
+            listener.send(['start', 'Got it!'])
+    except Exception as e:
+        LOGGER.error(e)
