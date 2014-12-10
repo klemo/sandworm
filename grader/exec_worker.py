@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
 
+import time
 import pika
 import logging
 import simplejson as json
@@ -22,7 +23,8 @@ def on_message(ch, method, properties, body):
     except Exception as e:
         logging.error(e)
     ch.basic_ack(delivery_tag = method.delivery_tag)
-    ###
+    ### simulate work ###
+    time.sleep(5)
     message['finished'] = True
     update_progress(ch, message)
 

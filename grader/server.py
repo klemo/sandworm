@@ -168,8 +168,8 @@ class LabHandler(BaseHandler):
     def post(self):
         user = self.get_current_user()
         try:
-            user_archive_path = db.save_uploaded_archive(self.request, user)
-            db.submit_job(self.application, user_archive_path, user)
+            archive_path = db.save_uploaded_archive(self.request, user)
+            db.submit_job(self.application, archive_path, user)
             utils.jsonify(self, True)
         except Exception as e:
             LOGGER.error(e)

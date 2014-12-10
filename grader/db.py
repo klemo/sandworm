@@ -132,19 +132,17 @@ def save_uploaded_archive(request, user):
     '''
     filepost = request.files.get('file')
     fileinfo = filepost[0]
-    fname = fileinfo['filename']
-    ext = os.path.splitext(fname)[1]
-    # generate new unique name
-    archive_name = str(uuid.uuid4()) + ext
+    file_name = fileinfo['filename']
     # dir path: UPLOAD_DIR/{{username}}/
-    user_archive_dir_path = os.path.join(settings.UPLOAD_DIR,
-                                         user['username'])
-    if not os.path.exists(user_archive_dir_path):
-        os.makedirs(user_archive_dir_path)
-    user_archive_path = os.path.join(user_archive_dir_path, archive_name)
-    with open(user_archive_path, 'wb') as f:
+    archive_dir_path = os.path.join(settings.UPLOAD_DIR,
+                                    user['username'])
+    if not os.path.exists(archive_dir_path):
+        os.makedirs(archive_dir_path)
+    archive_path = os.path.join(archive_dir_path, file_name)
+    with open(archive_path, 'wb') as f:
         f.write(fileinfo['body'])
-    return user_archive_path
+    LOGGER.info('File {} saved to {}'.format(file_name, archive_dir_path))
+    return archive_path
 
 #------------------------------------------------------------------------------
 
@@ -152,9 +150,13 @@ def submit_job(application, archive_path, user):
     '''
     Submits user job to message queue
     '''
-    LOGGER.info('Submitting {} for user {} to queue'.format(archive_path,
+    # generate unique job id
+    job_id = str(uuid.uuid4())
+    # TODO save this to db
+    LOGGER.info('Submitting {} to queue for user {}'.format(archive_path,
                                                             user['username']))
     message = {
+        'job_id': job_id,
         'username': user['username'],
         'archive_path': archive_path
         }
