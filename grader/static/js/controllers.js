@@ -85,7 +85,7 @@ var sandwormControllers = angular.module('sandwormControllers', [
     });
 }])
 /** LabDetailsCtrl @description displays lab details */
-.controller('LabDetailsCtrl', ['$stateParams', 'LabService', 'FileUploader', '$cookies', function($stateParams, LabService, FileUploader, $cookies) {
+.controller('LabDetailsCtrl', ['$stateParams', 'LabService', 'FileUploader', '$cookies', '$socket', function($stateParams, LabService, FileUploader, $cookies, $socket) {
     var self = this;
     self.lab = LabService.get({labId: $stateParams.labId}, function(lab) {
         //lab.isOver = lab.end < Date.now();
@@ -114,6 +114,12 @@ var sandwormControllers = angular.module('sandwormControllers', [
     self.uploader.onAfterAddingFile = function(fileItem) {
         self.errorMessage = '';
     };
+
+    $socket.on('start', function(e, data){
+        console.log('Received: ', data);
+    });
+
+    $socket.send('start', []);
 }])
 .controller('LoginCtrl', ['UserService', '$state', function(UserService, $state) {
     var self = this;

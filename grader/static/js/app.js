@@ -7,10 +7,11 @@ var sandworm = angular.module('sandworm', [
     'ui.router',
     'ngResource',
     'ngCookies',
+    'ng-socket',
     'angularFileUpload',
     'sandwormServices',
     'sandwormControllers'
-]).config(function($stateProvider, $urlRouterProvider) {
+]).config(function($stateProvider, $urlRouterProvider, $socketProvider) {
     /* default (non-admin) pages */
     $stateProvider.state('index', {
         url: '/',
@@ -123,9 +124,17 @@ var sandworm = angular.module('sandworm', [
     });
     $urlRouterProvider.when('/admin', '/admin/labs');
     $urlRouterProvider.otherwise('/');
+
+    // set web sockets
+    $socketProvider.configure({
+        address: 'http://localhost:8080/api/v1/submitjob',
+        logger: function(e) {
+            console.log(e);
+        }
+    });
     
-}).run(['$rootScope', '$location', '$http', '$cookies', '$state', '$q', 'UserService',
-        function($rootScope, $location, $http, $cookies, $state, $q, UserService) {
+}).run(['$rootScope', '$location', '$http', '$cookies', '$state', '$q', '$socket', 'UserService',
+        function($rootScope, $location, $http, $cookies, $state, $q, $socket, UserService) {
 
     /* set xsrf header */
     $http.defaults.headers['post']['X-XSRFToken'] = $cookies['_xsrf'];
@@ -148,5 +157,7 @@ var sandworm = angular.module('sandworm', [
                 return $q.reject(err);
             });
     });
+
+    $socket.start();
     
 }]);

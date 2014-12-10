@@ -3,3 +3,4 @@ simplejson
 tornado
 pymongo
 pika
+sockjs-tornado

@@ -14,8 +14,10 @@ import tornado.auth
 import tornado.escape
 from tornado.options import define, options
 # application imports
+import sockjs.tornado
 import os.path
 import pymongo
+import uuid
 import simplejson as json
 import logging
 import settings
@@ -48,12 +50,12 @@ class Application(tornado.web.Application):
             # User API
             (r'/api/v1/labs$', LabHandler),
             (r'/api/v1/labs/(.+)', LabHandler),
-            (r'/api/v1/submitlabstatus', SubmitLabHandler),
             # Admin API
             (r'/api/v1/admin/labs$', AdminLabHandler),
             (r'/api/v1/admin/labs/(.+)', AdminLabHandler),
             (r'/api/v1/admin/results', AdminResultsHandler),
-            ]
+            ] + sockjs.tornado.SockJSRouter(SubmitLabHandler,
+                                            '/api/v1/submitjob').urls
         env = dict(
             template_path=os.path.join(
                 os.path.dirname(__file__), 'templates'),
@@ -176,22 +178,28 @@ class LabHandler(BaseHandler):
             utils.jsonify(self, {'code': 'upload failed'})
 
 #------------------------------------------------------------------------------
-
-WSUSERS = []
         
-class SubmitLabHandler(tornado.websocket.WebSocketHandler):
+class SubmitLabHandler(sockjs.tornado.SockJSConnection):
+    '''
+    Handles real-time async bidirectional connection for submitting labs for
+    remote execution using EXEC system
+    '''
 
-    def open(self, *args):
-        print('open', 'WebSocketChatHandler', self)
-        WSUSERS.append(self)
+    # TODO this will probaby end up in Redis...
+    users = set()
+
+    def on_open(self, *args):
+        print('SockJS connection opened')
+        self.users.add(self)
 
     def on_message(self, message):
-        print message
-        for client in WSUSERS:
-            WSUSERS.write_message(message)
+        print 'Received WS message: ', message
+        print 'Sending WS message: ', message
+        self.send(message)
         
     def on_close(self):
-        clients.remove(self)
+        self.users.remove(self)
+        print('SockJS connection closed')
 
 #------------------------------------------------------------------------------
         
