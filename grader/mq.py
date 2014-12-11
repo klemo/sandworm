@@ -49,17 +49,28 @@ class QConsumer(object):
                                                          self._queue)
 
     def on_message(self, unused_channel, basic_deliver, properties, body):
+        '''
+        Fired when message arrives to queue. This method also calls
+        custom on_msg func (defined on __init__) that notifies listeners
+        '''
         LOGGER.info('QConsumer: Received message # %s from %s: %s',
                     basic_deliver.delivery_tag, properties.app_id, body)
-        # call custom on_msg func
-        self._on_msg(body, self._listeners)
         self._channel.basic_ack(basic_deliver.delivery_tag)
+        self._on_msg(body, self._listeners)
 
     def add_listener(self, listener):
+        '''
+        Register listener that will be notified when message arrives;
+        Listeners are active websocket connections registered on
+        on_open ws method 
+        '''
         self._listeners.add(listener)
         LOGGER.info('QConsumer: Added listener {}'.format(listener))
 
     def remove_listener(self, listener):
+        '''
+        Removes listener on on_close ws method
+        '''
         try:
             self._listeners.remove(listener)
             LOGGER.info('QConsumer: Removed listener {}'.format(listener))

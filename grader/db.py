@@ -166,10 +166,11 @@ def submit_job(application, archive_path, user):
 #------------------------------------------------------------------------------
 
 def handle_job_event(msg, listeners):
+    LOGGER.info('Handle job event: {}'.format(msg))
     try:
-        content = json.loads(msg)
-        LOGGER.info('Handle job event: {}'.format(content))
+        data = json.loads(msg)
         for listener in listeners:
-            listener.send(['start', 'Got it!'])
+            if listener.username == data['username']:
+                listener.send(['job-status', 'Got it!'])
     except Exception as e:
         LOGGER.error(e)

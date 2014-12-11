@@ -24,7 +24,7 @@ def on_message(ch, method, properties, body):
         logging.error(e)
     ch.basic_ack(delivery_tag = method.delivery_tag)
     ### simulate work ###
-    time.sleep(5)
+    time.sleep(3)
     message['finished'] = True
     update_progress(ch, message)
 

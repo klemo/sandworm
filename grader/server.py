@@ -189,19 +189,33 @@ class SubmitLabHandler(sockjs.tornado.SockJSConnection):
     '''
 
     def on_open(self, *args):
-        print('SockJS connection opened')
+        LOGGER.info('SockJS connection opened')
         self.session.server.application.q.add_listener(self)
 
     def on_message(self, message):
-        print 'Received WS message: ', message
-        # print 'Sending WS message: ', message
-        # self.send(message)
+        LOGGER.info('SockJS received {}'.format(message))
+        content = json.loads(message)
+        if len(content) <> 2:
+            LOGGER.error('SockJS: Invalid message format {}'.format(message))
+            return
+        (event, value) = content
+        # parse events
+        if event == 'start-conn':
+            # connection started; store active user
+            self.username = value
+            msg = (event, 'ok')
+            self.send(json.dumps(msg))
         
     def on_close(self):
         self.session.server.application.q.remove_listener(self)
-        print('SockJS connection closed')
+        LOGGER.info('SockJS connection closed')
 
+#------------------------------------------------------------------------------
+        
 class SubmitLabRouter(sockjs.tornado.SockJSRouter):
+    '''
+    Subclass SockJSRouter in order to inject application object to sockjs conn
+    '''
 
     def __init__(self, handler, url, application):
         self.application = application
