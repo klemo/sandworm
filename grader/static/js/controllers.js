@@ -119,13 +119,16 @@ var sandwormControllers = angular.module('sandwormControllers', [
     // Start sockjs connection and wait for messages
     var user = UserService.currentUser;
     $socket.start();
-    $socket.on('start-conn', function(e, data){
-        console.log('Received: start-conn', data);
+    $socket.on('get-user', function(e, data){
+        console.log('Received: get-user', data);
+        $socket.send('user', user.username);
+    });
+    $socket.on('user', function(e, data){
+        console.log('Received: user', data);
     });
     $socket.on('job-status', function(e, data){
         console.log('Received: job-status', data);
     });
-    $socket.send('start-conn', user.username);
 }])
 .controller('LoginCtrl', ['UserService', '$state', function(UserService, $state) {
     var self = this;

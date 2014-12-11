@@ -191,6 +191,8 @@ class SubmitLabHandler(sockjs.tornado.SockJSConnection):
     def on_open(self, *args):
         LOGGER.info('SockJS connection opened')
         self.session.server.application.q.add_listener(self)
+        msg = ('get-user', '')
+        self.send(json.dumps(msg))
 
     def on_message(self, message):
         LOGGER.info('SockJS received {}'.format(message))
@@ -200,7 +202,7 @@ class SubmitLabHandler(sockjs.tornado.SockJSConnection):
             return
         (event, value) = content
         # parse events
-        if event == 'start-conn':
+        if event == 'user':
             # connection started; store active user
             self.username = value
             msg = (event, 'ok')

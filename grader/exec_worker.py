@@ -23,10 +23,11 @@ def on_message(ch, method, properties, body):
     except Exception as e:
         logging.error(e)
     ch.basic_ack(delivery_tag = method.delivery_tag)
+    # update status
+    update_progress(ch, message, 'worker-received')
     ### simulate work ###
     time.sleep(3)
-    message['finished'] = True
-    update_progress(ch, message)
+    update_progress(ch, message, 'worker-finished')
 
 #------------------------------------------------------------------------------
 
@@ -42,12 +43,13 @@ def consume():
 
 #------------------------------------------------------------------------------
     
-def update_progress(channel, content):
+def update_progress(channel, content, status):
     properties = pika.BasicProperties(
         app_id='exec-worker',
         content_type='application/json',
         delivery_mode = 2, # make message persistent
         )
+    content['status'] = status
     message = json.dumps(content, ensure_ascii=False)
     channel.basic_publish(exchange='', routing_key=QUEUE_PUBLISH,
                           body=message, properties=properties)
