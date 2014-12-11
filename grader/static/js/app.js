@@ -8,6 +8,7 @@ var sandworm = angular.module('sandworm', [
     'ngResource',
     'ngCookies',
     'ng-socket',
+    'ui.bootstrap',
     'angularFileUpload',
     'sandwormServices',
     'sandwormControllers'

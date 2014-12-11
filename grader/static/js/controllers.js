@@ -115,6 +115,11 @@ var sandwormControllers = angular.module('sandwormControllers', [
     self.uploader.onAfterAddingFile = function(fileItem) {
         self.errorMessage = '';
     };
+    self.uploader.onSuccessItem = function(fileItem) {
+        self.errorMessage = '';
+        self.jobStatus = 'Uploaded';
+        self.jobStatusProgress = 30;
+    };
 
     // Start sockjs connection and wait for messages
     var user = UserService.currentUser;
@@ -128,6 +133,8 @@ var sandwormControllers = angular.module('sandwormControllers', [
     });
     $socket.on('job-status', function(e, data){
         console.log('Received: job-status', data);
+        self.jobStatus = data;
+        self.jobStatusProgress += 30;
     });
 }])
 .controller('LoginCtrl', ['UserService', '$state', function(UserService, $state) {

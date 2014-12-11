@@ -4,12 +4,9 @@
   </h2>
   <p>{{lab.desc}}</p>
   <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-12">
       Rok za predaju: <span ng-class="{'label label-danger': lab.isOver,
                                        'label label-success': !lab.isOver}">{{lab.end | date:'dd. MM. yyyy HH:mm:ss'}}</span>
-    </div>
-    <div class="col-md-2">
-      <button type="button" class="btn btn-primary pull-right" ng-hide="lab.submitted">Predaj rješenje</button>
     </div>
   </div>
 </div>

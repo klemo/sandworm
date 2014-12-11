@@ -55,6 +55,14 @@
         </div>
       </div>
     </div>
+    <div class="job-progress">
+      <progressbar class="progress-striped active"
+                   value="ctrl.jobStatusProgress"
+                   type="info"
+                   max="90">
+        {{ctrl.jobStatus}}
+      </progressbar>
+    </div>
   </div>
 
   <div ng-if="ctrl.lab.results" class="score">
