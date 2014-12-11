@@ -7,7 +7,10 @@ setup
 currently just a simple angular app with tornado backend
 
 
-  0. install python, mongo and stuff from requirements.txt (pip install -r requirements.txt)
+  0. install python(2.7), mongodb, rabbitmq and stuff from requirements.txt:
+    ```shell
+    sudo pip install -r requirements.txt
+    ```
 
   1. load test db:
     ```shell
