@@ -5,10 +5,17 @@
 import functools
 import pymongo
 import redis
+import logging
 import argparse
 import simplejson as json
 from bson import json_util
 import settings
+
+#------------------------------------------------------------------------------
+
+LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
+              '-35s %(lineno) -5d: %(message)s')
+LOGGER = logging.getLogger(__name__)
 
 #------------------------------------------------------------------------------
 
@@ -18,7 +25,7 @@ def jsonify(req, data):
 
 #------------------------------------------------------------------------------
 
-def auth(role=None):
+def auth(role=None, websock=False):
     def authenticate(method):
         '''
         Custom auth handler
@@ -27,10 +34,16 @@ def auth(role=None):
         def wrapper(self, *args, **kwargs):
             if not self.current_user:
                 self.set_status(400)
-                jsonify(self, {'error': 'not authenticated'})
+                if not websock:
+                    jsonify(self, {'error': 'not authenticated'})
+                else:
+                    LOGGER.error('WS not authenticated')
                 return
             if role and self.current_user['role'] <> role:
-                jsonify(self, {'error': 'not authorized'})
+                if not websock:
+                    jsonify(self, {'error': 'not authorized'})
+                else:
+                    LOGGER.error('WS not authorized')
                 return
             return method(self, *args, **kwargs)
         return wrapper

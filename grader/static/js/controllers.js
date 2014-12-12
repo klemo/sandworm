@@ -90,6 +90,8 @@ var sandwormControllers = angular.module('sandwormControllers', [
     self.lab = LabService.get({labId: $stateParams.labId}, function(lab) {
         //lab.isOver = lab.end < Date.now();
     });
+    self.jobStatus = '';
+    self.jobStatusProgress = 0;
     // Handle file uploading
     self.uploader = new FileUploader({
         url: '/api/v1/labs',
@@ -123,19 +125,39 @@ var sandwormControllers = angular.module('sandwormControllers', [
 
     // Start sockjs connection and wait for messages
     var user = UserService.currentUser;
-    $socket.start();
-    $socket.on('get-user', function(e, data){
-        console.log('Received: get-user', data);
-        $socket.send('user', user.username);
-    });
-    $socket.on('user', function(e, data){
-        console.log('Received: user', data);
-    });
-    $socket.on('job-status', function(e, data){
-        console.log('Received: job-status', data);
-        self.jobStatus = data;
-        self.jobStatusProgress += 30;
-    });
+    // $socket.start();
+    // $socket.on('get-user', function(e, data){
+    //     console.log('Received: get-user', data);
+    //     $socket.send('user', user.username);
+    // });
+    // $socket.on('user', function(e, data){
+    //     console.log('Received: user', data);
+    // });
+    // $socket.on('job-status', function(e, data){
+    //     console.log('Received: job-status', data);
+    //     self.jobStatus = data;
+    //     self.jobStatusProgress += 30;
+    // });
+    var ws = new WebSocket('ws://localhost:8080/api/v1/submitjob');
+    ws.onopen = function() {};
+    ws.onmessage = function (evt) {
+        var msg = JSON.parse(evt.data);
+        if (msg.length !== 2) {
+            console.log('WS invalid message format', msg)
+        } else {
+            var event = msg[0];
+            var data = msg[1];
+            switch(event) {
+            case 'job-status':
+                console.log(event, data);
+                self.jobStatus = data;
+                self.jobStatusProgress += 30;
+                break;
+            default:
+                console.log('WS unknown event', msg);
+            }
+        };
+    };
 }])
 .controller('LoginCtrl', ['UserService', '$state', function(UserService, $state) {
     var self = this;

@@ -170,7 +170,8 @@ def handle_job_event(msg, listeners):
     try:
         data = json.loads(msg)
         for listener in listeners:
-            if listener.username == data['username']:
-                listener.send(['job-status', data['status']])
+            #if listener.username == data['username']:
+            ret_msg = ['job-status', data['status']]
+            listener.write_message(json.dumps(ret_msg))
     except Exception as e:
         LOGGER.error(e)

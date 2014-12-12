@@ -55,8 +55,10 @@ class Application(tornado.web.Application):
             (r'/api/v1/admin/labs$', AdminLabHandler),
             (r'/api/v1/admin/labs/(.+)', AdminLabHandler),
             (r'/api/v1/admin/results', AdminResultsHandler),
-            ] + SubmitLabRouter(SubmitLabHandler,
-                                '/api/v1/submitjob', self).urls
+            #
+            (r'/api/v1/submitjob', SubmitLabHandler_),
+            ] #+ SubmitLabRouter(SubmitLabHandler,
+              #                  '/api/v1/submitjob', self).urls
         env = dict(
             template_path=os.path.join(
                 os.path.dirname(__file__), 'templates'),
@@ -180,6 +182,47 @@ class LabHandler(BaseHandler):
             LOGGER.error(e)
             utils.jsonify(self, {'code': 'upload failed'})
 
+#------------------------------------------------------------------------------
+
+class SubmitLabHandler_(tornado.websocket.WebSocketHandler):
+    '''
+    Handles real-time async bidirectional connection for submitting labs for
+    remote execution using EXEC system
+    '''
+
+    @utils.auth('user', websock=True)
+    def open(self):
+        LOGGER.info('WS connection opened')
+        self.user = self.get_current_user()
+        self.application.q.add_listener(self)
+
+    @utils.auth('user', websock=True)
+    def on_message(self, message):
+        LOGGER.info('WS received {}'.format(message))
+        content = json.loads(message)
+        if len(content) <> 2:
+            LOGGER.error('WS: Invalid message format {}'.format(message))
+            return
+        # (event, value) = content
+        # # parse events
+        # if event == 'user':
+        #     # connection started; store active user
+        #     self.username = value
+        #     msg = (event, 'ok')
+        #     self.write_message(json.dumps(msg))
+
+    @utils.auth('user', websock=True)
+    def on_close(self):
+        self.application.q.remove_listener(self)
+        LOGGER.info('WS connection closed')
+
+    def get_current_user(self):
+        '''
+        Same method as for the default tornado request handler
+        '''
+        username = self.get_secure_cookie('username')
+        return db.get_user(self.application.db, username)
+        
 #------------------------------------------------------------------------------
 
 class SubmitLabHandler(sockjs.tornado.SockJSConnection):
