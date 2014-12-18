@@ -122,6 +122,21 @@ var sandworm = angular.module('sandworm', [
                 templateUrl: 'static/views/admin_results.html',
                 controller: 'AdminResultsCtrl as ctrl'}
         }        
+    }).state('admin-users', {
+        url: '/admin/users',
+        data: {
+            isPublic: false,
+            access: 'admin',
+        },
+        views: {
+            'uir-view-nav': {
+                templateUrl: 'static/views/admin_nav.html',
+                controller: 'LoginCtrl as ctrl'
+            },
+            'uir-view-content': {
+                templateUrl: 'static/views/admin_users.html',
+                controller: 'AdminUsersCtrl as ctrl'}
+        }        
     });
     $urlRouterProvider.when('/admin', '/admin/labs');
     $urlRouterProvider.otherwise('/');

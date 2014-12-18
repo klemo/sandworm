@@ -1,0 +1,21 @@
+<ol class="breadcrumb">
+  <li><a href="#/admin">Admin</a></li>
+  <li class="active">Users</li>
+</ol>
+
+<div class="row">
+  <table class="table table-hover">
+    <tr>
+      <th>Korisničko ime</th>
+      <th>Uloga</th>
+      <th>Zadnja prijava</th>
+    </tr>
+    <tr ng-repeat="user in ctrl.users | orderBy:'username'">
+      <td>{{user.username}}</td>
+      <td>
+        <span ng-class="{'label label-danger': user.role === 'admin'}">{{user.role}}</span>
+      </td>
+      <td></td>
+    </tr>
+  </table>
+</div>

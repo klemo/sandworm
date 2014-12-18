@@ -55,6 +55,7 @@ class Application(tornado.web.Application):
             (r'/api/v1/admin/labs$', AdminLabHandler),
             (r'/api/v1/admin/labs/(.+)', AdminLabHandler),
             (r'/api/v1/admin/results', AdminResultsHandler),
+            (r'/api/v1/admin/users', AdminUsersHandler),
             #
             (r'/api/v1/submitjob', SubmitLabHandler_),
             ] #+ SubmitLabRouter(SubmitLabHandler,
@@ -157,6 +158,14 @@ class AdminResultsHandler(BaseHandler):
     @utils.auth('admin')
     def get(self):
         utils.jsonify(self, db.get_admin_all_results(self.application.db))
+
+#------------------------------------------------------------------------------
+
+class AdminUsersHandler(BaseHandler):
+
+    @utils.auth('admin')
+    def get(self):
+        utils.jsonify(self, db.get_admin_users(self.application.db))
 
 #------------------------------------------------------------------------------
 # User API

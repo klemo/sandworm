@@ -73,6 +73,14 @@ var sandwormControllers = angular.module('sandwormControllers', [
     self.results = AdminResultsService.query();
 }])
 
+/** AdminUsersCtrl @description displays users info on admin pages */
+.controller('AdminUsersCtrl', ['$stateParams', 'AdminUsersService', function($stateParams, AdminUsersService) {
+    var self = this;
+    self.users = AdminUsersService.query();
+    console.log(self.users);
+}])
+
+/*****************************************************************************/
 /* User controllers */
 /** LabCtrl @description displays labs */
 .controller('LabCtrl', ['LabService', function(LabService) {

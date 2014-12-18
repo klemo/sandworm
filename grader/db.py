@@ -66,6 +66,14 @@ def get_admin_all_results(db):
 
 #------------------------------------------------------------------------------
 
+def get_admin_users(db):
+    '''
+    Return all users
+    '''
+    return list(db.users.find({}, USER_PROPS))
+
+#------------------------------------------------------------------------------
+
 def save_admin_lab(db, lab):
     '''
     Create new lab

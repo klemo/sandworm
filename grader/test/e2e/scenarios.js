@@ -116,6 +116,18 @@ describe('Sandowrm App', function() {
             
         });
 
+        describe('Users', function() {
+            
+            beforeEach(function() {
+                browser.driver.get(baseUrl + 'admin/users');
+            });
+
+            it('should display all users', function() {
+                var users = element.all(by.repeater('user in ctrl.users'));
+                expect(users.count()).toBe(2);
+            });
+        });
+
 
         describe('All results', function() {
             
