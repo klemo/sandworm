@@ -7,6 +7,7 @@ import uuid
 import functools
 import simplejson as json
 import logging
+from datetime import datetime
 import settings
 
 #------------------------------------------------------------------------------
@@ -36,6 +37,9 @@ def login_user(db, logindata):
     # todo: check password...
     if not user:
         return None, 'no such user'
+    user['lastLogin'] = datetime.now()
+    db.users.update({'username': user['username']}, user,
+                    upsert=False, multi=False)
     return user, None
 
 #------------------------------------------------------------------------------

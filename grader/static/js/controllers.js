@@ -77,7 +77,6 @@ var sandwormControllers = angular.module('sandwormControllers', [
 .controller('AdminUsersCtrl', ['$stateParams', 'AdminUsersService', function($stateParams, AdminUsersService) {
     var self = this;
     self.users = AdminUsersService.query();
-    console.log(self.users);
 }])
 
 /*****************************************************************************/
