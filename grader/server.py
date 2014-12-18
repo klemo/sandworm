@@ -14,7 +14,6 @@ import tornado.auth
 import tornado.escape
 from tornado.options import define, options
 # application imports
-import sockjs.tornado
 import os.path
 import pymongo
 import redis
@@ -234,46 +233,46 @@ class SubmitLabHandler_(tornado.websocket.WebSocketHandler):
         
 #------------------------------------------------------------------------------
 
-class SubmitLabHandler(sockjs.tornado.SockJSConnection):
-    '''
-    Handles real-time async bidirectional connection for submitting labs for
-    remote execution using EXEC system
-    '''
+# class SubmitLabHandler(sockjs.tornado.SockJSConnection):
+#     '''
+#     Handles real-time async bidirectional connection for submitting labs for
+#     remote execution using EXEC system
+#     '''
 
-    def on_open(self, *args):
-        LOGGER.info('SockJS connection opened')
-        self.session.server.application.q.add_listener(self)
-        msg = ('get-user', '')
-        self.send(json.dumps(msg))
+#     def on_open(self, *args):
+#         LOGGER.info('SockJS connection opened')
+#         self.session.server.application.q.add_listener(self)
+#         msg = ('get-user', '')
+#         self.send(json.dumps(msg))
 
-    def on_message(self, message):
-        LOGGER.info('SockJS received {}'.format(message))
-        content = json.loads(message)
-        if len(content) <> 2:
-            LOGGER.error('SockJS: Invalid message format {}'.format(message))
-            return
-        (event, value) = content
-        # parse events
-        if event == 'user':
-            # connection started; store active user
-            self.username = value
-            msg = (event, 'ok')
-            self.send(json.dumps(msg))
+#     def on_message(self, message):
+#         LOGGER.info('SockJS received {}'.format(message))
+#         content = json.loads(message)
+#         if len(content) <> 2:
+#             LOGGER.error('SockJS: Invalid message format {}'.format(message))
+#             return
+#         (event, value) = content
+#         # parse events
+#         if event == 'user':
+#             # connection started; store active user
+#             self.username = value
+#             msg = (event, 'ok')
+#             self.send(json.dumps(msg))
         
-    def on_close(self):
-        self.session.server.application.q.remove_listener(self)
-        LOGGER.info('SockJS connection closed')
+#     def on_close(self):
+#         self.session.server.application.q.remove_listener(self)
+#         LOGGER.info('SockJS connection closed')
 
-#------------------------------------------------------------------------------
+# #------------------------------------------------------------------------------
         
-class SubmitLabRouter(sockjs.tornado.SockJSRouter):
-    '''
-    Subclass SockJSRouter in order to inject application object to sockjs conn
-    '''
+# class SubmitLabRouter(sockjs.tornado.SockJSRouter):
+#     '''
+#     Subclass SockJSRouter in order to inject application object to sockjs conn
+#     '''
 
-    def __init__(self, handler, url, application):
-        self.application = application
-        sockjs.tornado.SockJSRouter.__init__(self, handler, url)
+#     def __init__(self, handler, url, application):
+#         self.application = application
+#         sockjs.tornado.SockJSRouter.__init__(self, handler, url)
 
 #------------------------------------------------------------------------------
         
