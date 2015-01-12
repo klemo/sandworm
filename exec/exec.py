@@ -8,17 +8,23 @@ from docker import Client
 
 #------------------------------------------------------------------------------
 
-def run_in_docker(dirname, progname):
+DOCKER_LANG_IMG = {'.py': 'python:2'}
+DOCKER_LANG_CMD = {'.py': 'python'}
+
+#------------------------------------------------------------------------------
+
+def run_in_docker(dirname, progname, lang):
     '''
     Create docker container with volume dirname and run (python) program inside
     '''
     docker = Client(base_url='unix://var/run/docker.sock',
                     version='1.15')
-    container = docker.create_container(image='python:2',
-                                        volumes={'/tmp':''},
-                                        working_dir='/tmp',
-                                        command='python {}'.format(progname),
-                                        network_disabled=True)
+    container = docker.create_container(
+        image=DOCKER_LANG_IMG[lang],
+        volumes={'/tmp':''},
+        working_dir='/tmp',
+        command='{} {}'.format(DOCKER_LANG_CMD[lang], progname),
+        network_disabled=True)
     response = docker.start(container.get('Id'),
                             binds={dirname: {'bind': '/tmp'}})
     docker.wait(container.get('Id'))
@@ -38,9 +44,9 @@ def run_job(filename):
     with zipfile.ZipFile(filename) as zfile:
         for f in zfile.filelist:
             name, ext = os.path.splitext(f.filename)
-            if ext == '.py':
+            if ext in DOCKER_LANG_IMG.keys():
                 zfile.extract(f.filename, 'tmp')
-                return run_in_docker(os.path.abspath('tmp'), f.filename)
+                return run_in_docker(os.path.abspath('tmp'), f.filename, ext)
 
 #------------------------------------------------------------------------------
                 
