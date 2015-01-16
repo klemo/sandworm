@@ -13,7 +13,7 @@ DOCKER_LANG_CMD = {'.py': 'python'}
 
 #------------------------------------------------------------------------------
 
-def run_in_docker(dirname, progname, lang):
+def run_in_docker(archive_dir_name, progname, lang):
     '''
     Create docker container with volume dirname and run (python) program inside
     '''
@@ -21,12 +21,13 @@ def run_in_docker(dirname, progname, lang):
                     version='1.15')
     container = docker.create_container(
         image=DOCKER_LANG_IMG[lang],
-        volumes={'/tmp':''},
+        volumes=['/tmp'],
         working_dir='/tmp',
         command='{} {}'.format(DOCKER_LANG_CMD[lang], progname),
         network_disabled=True)
-    response = docker.start(container.get('Id'),
-                            binds={dirname: {'bind': '/tmp'}})
+    response = docker.start(
+        container.get('Id'),
+        binds={archive_dir_name: {'bind': '/tmp', 'ro': True}})
     docker.wait(container.get('Id'))
     output = docker.logs(container.get('Id'))
     docker.stop(container.get('Id'))
