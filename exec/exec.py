@@ -8,8 +8,14 @@ from docker import Client
 
 #------------------------------------------------------------------------------
 
-DOCKER_LANG_IMG = {'.py': 'python:2'}
-DOCKER_LANG_CMD = {'.py': 'python'}
+LANGS = {
+    'python:2': {'ext': '.py',
+                 'img': 'python:2',
+                 'cmd': 'python'},
+    'python:3': {'ext': '.py',
+                 'img': 'python:3',
+                 'cmd': 'python'},
+    }
 
 #------------------------------------------------------------------------------
 
@@ -20,10 +26,10 @@ def run_in_docker(archive_dir_name, progname, lang):
     docker = Client(base_url='unix://var/run/docker.sock',
                     version='1.15')
     container = docker.create_container(
-        image=DOCKER_LANG_IMG[lang],
+        image=LANGS[lang]['img'],
         volumes=['/tmp'],
         working_dir='/tmp',
-        command='{} {}'.format(DOCKER_LANG_CMD[lang], progname),
+        command='{} {}'.format(LANGS[lang]['cmd'], progname),
         network_disabled=True)
     response = docker.start(
         container.get('Id'),
@@ -36,20 +42,21 @@ def run_in_docker(archive_dir_name, progname, lang):
 
 #------------------------------------------------------------------------------
 
-def run_job(filename):
+def run_task(userid, taskid, archive, lang):
     '''
-    Runs job stored in an archive
+    Runs user task stored in an archive written in given lang 
     '''
     if not os.path.exists('tmp'):
         os.makedirs('tmp')
-    with zipfile.ZipFile(filename) as zfile:
+    archive_path = os.path.join('testdata', 'user', userid, taskid, archive)
+    with zipfile.ZipFile(archive_path) as zfile:
         for f in zfile.filelist:
             name, ext = os.path.splitext(f.filename)
-            if ext in DOCKER_LANG_IMG.keys():
+            if ext == LANGS[lang]['ext']:
                 zfile.extract(f.filename, 'tmp')
-                return run_in_docker(os.path.abspath('tmp'), f.filename, ext)
+                return run_in_docker(os.path.abspath('tmp'), f.filename, lang)
 
 #------------------------------------------------------------------------------
                 
 if __name__=='__main__':
-    print(run_job('p1.zip'))
+    print(run_task('user1', 'lab1', 'lab.zip', 'python:3'))
