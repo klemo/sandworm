@@ -53,7 +53,8 @@ def eval_cfg(taskid, test_name, lang):
     Evaluates configuration file for task taskid and runs test_name written in
     lang
     '''
-    passed = False
+    passed = True
+    last_result = None
     testdata_archive_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         'testdata',
@@ -68,31 +69,42 @@ def eval_cfg(taskid, test_name, lang):
                 cfg.append(line)
     try:
         for line in cfg:
-            logging.info('running command ' + line)
+            logging.info('Running command ' + line)
             parts = line.split()
             option = parts[0]
-            if option == 'cwd':
+            # CWD
+            if option.upper() == 'CWD':
                 pass
-            elif option == 'compile':
+            # COMPILE
+            elif option.upper() == 'COMPILE':
                 pass
-            elif option == 'run':
+            # RUN
+            elif option.upper() == 'RUN':
                 what = parts[1]
                 timeout = int(parts[2])
                 input_filename = None
                 if len(parts) == 4:
                     input_filename = '/testdata/{}/primjer.{}'.format(test_name, parts[3])
 
-                out = run_in_docker(testdata_archive_path,
-                                    os.path.abspath('tmp'),
-                                    what,
-                                    input_filename,
-                                    lang)
-                print(out)
-
-            elif option == 'check_output':
-                pass
-            elif option == 'FRISCjs':
-                pass
+                last_result = run_in_docker(testdata_archive_path,
+                                            os.path.abspath('tmp'),
+                                            what,
+                                            input_filename,
+                                            lang)
+            # ASSERT
+            elif option.upper() == 'ASSERT':
+                # read expected output
+                output_filename = os.path.join(testdata_archive_path,
+                                               test_name,
+                                               'primjer.{}'.format(parts[1]))
+                with open(output_filename, 'r') as fout:
+                    expected = fout.read()
+                    # and check for equality
+                    if last_result.strip() != expected.strip():
+                        print('Expected:\n{}\nGot:\n{}\n'.format(expected, last_result))
+                        passed = False
+                    else:
+                        logging.info('Test passed!')
     except Exception as e:
         logging.error('eval_cfg: {}'.format(e))
         passed = False
@@ -119,4 +131,9 @@ def run_task(userid, taskid, archive, lang, check_integration=True):
 #------------------------------------------------------------------------------
                 
 if __name__=='__main__':
+    logging.getLogger('').handlers = []
+    logging.basicConfig(level=getattr(logging, 'DEBUG', None),
+                        format='%(message)s',
+                        datefmt='%m/%d/%Y %I:%M:%S %p')
+    logging.getLogger('docker').setLevel(logging.CRITICAL)
     run_task('user1', 'lab1', 'lab.zip', 'python:3')
