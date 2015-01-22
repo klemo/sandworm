@@ -45,14 +45,18 @@ class TestRunner():
         for test_name in os.listdir(self.testdata_archive_path):
             test_dir = os.path.join(self.testdata_archive_path, test_name)
             if os.path.isdir(test_dir):
-                test = {'name': test_name,
-                        'in': None,
-                        'out': None}
                 # parse .in and .out files
-                for iofile in os.listdir(test_dir):
-                    name, ext = os.path.splitext(iofile)
-                    test[ext[1:]] = iofile
-                self.tests.append(test)
+                iofiles = os.listdir(test_dir)
+                if iofiles:
+                    test = {'name': test_name,
+                            'in': None,
+                            'out': None}
+                    for iofile in os.listdir(test_dir):
+                        name, ext = os.path.splitext(iofile)
+                        test[ext[1:]] = iofile
+                    self.tests.append(test)
+                else:
+                    logging.info('Ignoring empty folder: {}'.format(test_name))
         if self.tests:
             logging.info('Found tests: OK ({} tests)'.format(
                     len(self.tests)))
@@ -159,11 +163,11 @@ class TestRunner():
                         expected = fout.read()
                         # and check for equality
                         if last_result.strip() != expected.strip():
-                            print('Expected:\n{}\nGot:\n{}\n'.format(
+                            logging.info('Passed: False')
+                            logging.info('Expected:\n{}\nGot:\n{}\n'.format(
                                     expected,
                                     last_result))
                             passed = False
-                            logging.info('Passed: False')
                         else:
                             logging.info('Passed: True')
         except Exception as e:
