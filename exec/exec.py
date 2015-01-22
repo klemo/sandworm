@@ -5,7 +5,7 @@
 import zipfile
 import os
 import logging
-from docker import Client
+import docker
 
 #------------------------------------------------------------------------------
 
@@ -30,22 +30,60 @@ class TestRunner():
             os.path.dirname(os.path.abspath(__file__)), 'testdata', 'labs',
             self.taskid)
         self.cfg = []
+        self.analyze_testdata()
+        
+    #--------------------------------------------------------------------------
+    def analyze_testdata(self):
+        logging.info('// Checking testdata folder: {}'.format(
+                self.testdata_archive_path))
+        if not os.path.isdir(self.testdata_archive_path):
+            raise Exception('Not a directory: {}'.format(
+                    self.testdata_archive_path))
         self.read_cfg()
+        # parse tests
+        self.tests = []
+        for test_name in os.listdir(self.testdata_archive_path):
+            test_dir = os.path.join(self.testdata_archive_path, test_name)
+            if os.path.isdir(test_dir):
+                test = {'name': test_name,
+                        'in': None,
+                        'out': None}
+                # parse .in and .out files
+                for iofile in os.listdir(test_dir):
+                    name, ext = os.path.splitext(iofile)
+                    test[ext[1:]] = iofile
+                self.tests.append(test)
+        if self.tests:
+            logging.info('Found tests: OK ({} tests)'.format(
+                    len(self.tests)))
+            integration_test = None
+            for test in self.tests:
+                if test['name'] == 'integration':
+                    integration_test = test
+                    logging.info('Integration test: OK')
+                    self.tests.remove(integration_test)
+                    break
+            if not integration_test:
+                raise Exception('Integration test: Not found')
         
     #--------------------------------------------------------------------------
     def read_cfg(self):
         '''
         Read configuration file and store commands in self.cfg
         '''
+        cfg_path = self.testdata_archive_path + '/eval.cfg'
         try:
-            with open(self.testdata_archive_path + '/eval.cfg', 'r') as cfg_file:
+            with open(cfg_path, 'r') as cfg_file:
+                logging.info('Config file: OK')
                 for line in cfg_file:
                     # get rid of comments and surrounding whitespace
                     line = line.split('#')[0].strip()
                     if len(line) > 0: # don't want empty lines
                         self.cfg.append(line)
         except Exception as e:
-            raise Exception('read_cfg: {}'.format(e))
+            raise Exception('Config file: {}'.format(e))
+        if not self.cfg:
+            raise Exception('Empty config file!')
                     
     #--------------------------------------------------------------------------
     def run_in_docker(self, user_archive, progname, input_file, lang):
@@ -57,31 +95,32 @@ class TestRunner():
                                           progname,
                                           LANGS[lang]['ext'],
                                           input_file)
-        docker = Client(base_url='unix://var/run/docker.sock',
-                        version='1.15')
-        container = docker.create_container(
+        dckr = docker.Client(base_url='unix://var/run/docker.sock',
+                             version='1.15')
+        container = dckr.create_container(
             image=LANGS[lang]['img'],
             volumes=['/tmp', '/testdata'],
             working_dir='/tmp',
             command='/bin/bash -c "{}"'.format(main_cmd),
             network_disabled=True)
-        response = docker.start(
+        response = dckr.start(
             container.get('Id'),
             binds={user_archive: {'bind': '/tmp'},
                    self.testdata_archive_path: {'bind': '/testdata',
                                                 'ro': True}})
-        docker.wait(container.get('Id'))
-        docker.stop(container.get('Id'))
-        output = docker.logs(container.get('Id'))
-        docker.remove_container(container.get('Id'))
+        dckr.wait(container.get('Id'))
+        dckr.stop(container.get('Id'))
+        output = dckr.logs(container.get('Id'))
+        dckr.remove_container(container.get('Id'))
         return output
 
     #--------------------------------------------------------------------------
-    def eval_cfg(self, test_name, lang):
+    def eval_cfg(self, test, lang):
         '''
-        Evaluates configuration file for self.taskid and runs test_name
+        Evaluates configuration file for self.taskid and runs test
         written in lang
         '''
+        logging.info('// Test: {}'.format(test['name']))
         passed = True
         last_result = None
         try:
@@ -101,9 +140,9 @@ class TestRunner():
                     timeout = int(parts[2])
                     input_filename = None
                     if len(parts) == 4:
-                        input_filename = '/testdata/{}/primjer.{}'.format(
-                            test_name, parts[3])
-
+                        input_filename = '/testdata/{}/{}'.format(
+                            test['name'],
+                            test[parts[3]])
                         last_result = self.run_in_docker(
                             os.path.abspath('tmp'),
                             what,
@@ -114,8 +153,8 @@ class TestRunner():
                     # read expected output
                     output_filename = os.path.join(
                         self.testdata_archive_path,
-                        test_name,
-                        'primjer.{}'.format(parts[1]))
+                        test['name'],
+                        test[parts[1]])
                     with open(output_filename, 'r') as fout:
                         expected = fout.read()
                         # and check for equality
@@ -124,17 +163,24 @@ class TestRunner():
                                     expected,
                                     last_result))
                             passed = False
+                            logging.info('Passed: False')
                         else:
-                            logging.info('Test passed!')
+                            logging.info('Passed: True')
         except Exception as e:
             logging.error('eval_cfg: {}'.format(e))
             passed = False
 
     #--------------------------------------------------------------------------
-    def run(self, userid, archive, lang, check_integration=True):
+    def eval_all(self, lang):
+        for test in self.tests:
+            self.eval_cfg(test, lang)
+        
+    #--------------------------------------------------------------------------
+    def run(self, userid, archive, lang, only_integration=False):
         '''
         Runs user task stored in an archive written in given lang 
         '''
+        logging.info('// Running tests for user {}'.format(userid))
         wdir = 'tmp'
         if not os.path.exists(wdir):
             os.makedirs(wdir)
@@ -146,19 +192,22 @@ class TestRunner():
         try:
             with zipfile.ZipFile(user_archive_path) as zfile:
                 zfile.extractall(path=wdir)
+                logging.info('Extracting user archive: OK')
         except Exception as e:
-            raise Exception(e)
-        if check_integration:
+            raise Exception('Extracting user archive: {}'.format(e))
+        if only_integration:
             self.eval_cfg('integration', lang)
+        else:
+            self.eval_all(lang)
 
 #------------------------------------------------------------------------------
                 
 if __name__=='__main__':
     logging.getLogger('').handlers = []
-    logging.basicConfig(level=getattr(logging, 'DEBUG', None),
+    logging.basicConfig(level=getattr(logging, 'INFO', None),
                         format='%(message)s',
                         datefmt='%m/%d/%Y %I:%M:%S %p')
-    logging.getLogger('docker').setLevel(logging.CRITICAL)
+    logging.getLogger('docker').setLevel(logging.INFO)
     taskid = 'lab1'
     tr = TestRunner(taskid)
     tr.run('user1', 'lab.zip', 'python:3')
