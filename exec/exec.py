@@ -23,7 +23,8 @@ LANGS = {
 class TestRunner():
 
     #-------------------------------------------------------------------------- 
-    def __init__(self, taskid):
+    def __init__(self, taskid, logger=None):
+        self.logger = logger or logging.getLogger(self.__class__.__name__)
         self.taskid = taskid # task to evaluate
         # locate testdata for given task
         self.testdata_archive_path = os.path.join(
@@ -34,7 +35,7 @@ class TestRunner():
         
     #--------------------------------------------------------------------------
     def analyze_testdata(self):
-        logging.info('// Checking testdata folder: {}'.format(
+        self.logger.info('// Checking testdata folder: {}'.format(
                 self.testdata_archive_path))
         if not os.path.isdir(self.testdata_archive_path):
             raise Exception('Not a directory: {}'.format(
@@ -56,15 +57,15 @@ class TestRunner():
                         test[ext[1:]] = iofile
                     self.tests.append(test)
                 else:
-                    logging.info('Ignoring empty folder: {}'.format(test_name))
+                    self.logger.info('Ignoring empty folder: {}'.format(test_name))
         if self.tests:
-            logging.info('Found tests: OK ({} tests)'.format(
+            self.logger.info('Found tests: OK ({} tests)'.format(
                     len(self.tests)))
             integration_test = None
             for test in self.tests:
                 if test['name'] == 'integration':
                     integration_test = test
-                    logging.info('Integration test: OK')
+                    self.logger.info('Integration test: OK')
                     self.tests.remove(integration_test)
                     break
             if not integration_test:
@@ -78,7 +79,7 @@ class TestRunner():
         cfg_path = self.testdata_archive_path + '/eval.cfg'
         try:
             with open(cfg_path, 'r') as cfg_file:
-                logging.info('Config file: OK')
+                self.logger.info('Config file: OK')
                 for line in cfg_file:
                     # get rid of comments and surrounding whitespace
                     line = line.split('#')[0].strip()
@@ -124,12 +125,12 @@ class TestRunner():
         Evaluates configuration file for self.taskid and runs test
         written in lang
         '''
-        logging.info('// Test: {}'.format(test['name']))
+        self.logger.info('// Test: {}'.format(test['name']))
         passed = True
         last_result = None
         try:
             for line in self.cfg:
-                logging.info('Running command ' + line)
+                self.logger.info('Running command ' + line)
                 parts = line.split()
                 option = parts[0]
                 # CWD
@@ -163,15 +164,15 @@ class TestRunner():
                         expected = fout.read()
                         # and check for equality
                         if last_result.strip() != expected.strip():
-                            logging.info('Passed: False')
-                            logging.info('Expected:\n{}\nGot:\n{}\n'.format(
+                            self.logger.info('Passed: False')
+                            self.logger.info('Expected:\n{}\nGot:\n{}\n'.format(
                                     expected,
                                     last_result))
                             passed = False
                         else:
-                            logging.info('Passed: True')
+                            self.logger.info('Passed: True')
         except Exception as e:
-            logging.error('eval_cfg: {}'.format(e))
+            self.logger.error('eval_cfg:', exc_info=True)
             passed = False
 
     #--------------------------------------------------------------------------
@@ -184,7 +185,7 @@ class TestRunner():
         '''
         Runs user task stored in an archive written in given lang 
         '''
-        logging.info('// Running tests for user {}'.format(userid))
+        self.logger.info('// Running tests for user {}'.format(userid))
         wdir = 'tmp'
         if not os.path.exists(wdir):
             os.makedirs(wdir)
@@ -196,7 +197,7 @@ class TestRunner():
         try:
             with zipfile.ZipFile(user_archive_path) as zfile:
                 zfile.extractall(path=wdir)
-                logging.info('Extracting user archive: OK')
+                self.logger.info('Extracting user archive: OK')
         except Exception as e:
             raise Exception('Extracting user archive: {}'.format(e))
         if only_integration:
@@ -207,10 +208,10 @@ class TestRunner():
 #------------------------------------------------------------------------------
                 
 if __name__=='__main__':
-    logging.getLogger('').handlers = []
-    logging.basicConfig(level=getattr(logging, 'INFO', None),
-                        format='%(message)s',
-                        datefmt='%m/%d/%Y %I:%M:%S %p')
+    logging.basicConfig(
+        level=getattr(logging, 'INFO', None),
+        format='%(asctime)s(%(name)s--%(levelname)s) : %(message)s',
+        datefmt='%m/%d/%Y %I:%M:%S %p')
     logging.getLogger('docker').setLevel(logging.INFO)
     taskid = 'lab1'
     tr = TestRunner(taskid)
