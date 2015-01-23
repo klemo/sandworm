@@ -6,20 +6,9 @@ import zipfile
 import os
 import logging
 import docker
+import settings
 
 #------------------------------------------------------------------------------
-
-LANGS = {
-    'python:2': {'ext': 'py',
-                 'img': 'python:2',
-                 'cmd': 'python'},
-    'python:3': {'ext': 'py',
-                 'img': 'python:3',
-                 'cmd': 'python'},
-    }
-
-#------------------------------------------------------------------------------
-
 class TestRunner():
 
     #-------------------------------------------------------------------------- 
@@ -57,7 +46,8 @@ class TestRunner():
                         test[ext[1:]] = iofile
                     self.tests.append(test)
                 else:
-                    self.logger.info('Ignoring empty folder: {}'.format(test_name))
+                    self.logger.info('Ignoring empty folder: {}'.format(
+                            test_name))
         if self.tests:
             self.logger.info('Found tests: OK ({} tests)'.format(
                     len(self.tests)))
@@ -96,23 +86,24 @@ class TestRunner():
         Create docker container with volume dirname and run (python) program
         inside
         '''
-        main_cmd = '{} {}.{} < {}'.format(LANGS[lang]['cmd'],
+        main_cmd = '{} {}.{} < {}'.format(settings.LANGS[lang]['cmd'],
                                           progname,
-                                          LANGS[lang]['ext'],
+                                          settings.LANGS[lang]['ext'],
                                           input_file)
         dckr = docker.Client(base_url='unix://var/run/docker.sock',
                              version='1.15')
         container = dckr.create_container(
-            image=LANGS[lang]['img'],
-            volumes=['/tmp', '/testdata'],
+            image=settings.LANGS[lang]['img'],
+            volumes=['/tmp', settings.CONTAINER_TESTDATA_PATH],
             working_dir='/tmp',
             command='/bin/bash -c "{}"'.format(main_cmd),
             network_disabled=True)
         response = dckr.start(
             container.get('Id'),
             binds={user_archive: {'bind': '/tmp'},
-                   self.testdata_archive_path: {'bind': '/testdata',
-                                                'ro': True}})
+                   self.testdata_archive_path: {
+                    'bind': settings.CONTAINER_TESTDATA_PATH,
+                    'ro': True}})
         dckr.wait(container.get('Id'))
         dckr.stop(container.get('Id'))
         output = dckr.logs(container.get('Id'))
@@ -145,7 +136,8 @@ class TestRunner():
                     timeout = int(parts[2])
                     input_filename = None
                     if len(parts) == 4:
-                        input_filename = '/testdata/{}/{}'.format(
+                        input_filename = os.path.join(
+                            settings.CONTAINER_TESTDATA_PATH,
                             test['name'],
                             test[parts[3]])
                         last_result = self.run_in_docker(
