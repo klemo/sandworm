@@ -4,17 +4,20 @@
 
 import zipfile
 import os
-import logging
 import docker
 import settings
+import logging.config
+import yaml
 
 #------------------------------------------------------------------------------
 class TestRunner():
 
     #-------------------------------------------------------------------------- 
-    def __init__(self, taskid, logger=None):
-        self.logger = logger or logging.getLogger(self.__class__.__name__)
+    def __init__(self, taskid):
         self.taskid = taskid # task to evaluate
+        self.logger = logging.getLogger('debug.{}.{}'.format(
+                self.__class__.__name__,
+                taskid))
         # locate testdata for given task
         self.testdata_archive_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), 'testdata', 'labs',
@@ -200,11 +203,9 @@ class TestRunner():
 #------------------------------------------------------------------------------
                 
 if __name__=='__main__':
-    logging.basicConfig(
-        level=getattr(logging, 'INFO', None),
-        format='%(asctime)s(%(name)s--%(levelname)s) : %(message)s',
-        datefmt='%m/%d/%Y %I:%M:%S %p')
-    logging.getLogger('docker').setLevel(logging.INFO)
-    taskid = 'lab1'
-    tr = TestRunner(taskid)
-    tr.run('user1', 'lab.zip', 'python:3')
+    with open('logging.yml', 'r') as f:
+        config_dict = yaml.load(f)
+        logging.config.dictConfig(config_dict)
+        taskid = 'lab1'
+        tr = TestRunner(taskid)
+        #tr.run('user1', 'lab.zip', 'python:3')
