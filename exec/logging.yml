@@ -4,14 +4,22 @@ handlers:
     class: logging.StreamHandler
     stream: ext://sys.stderr
     formatter: basic
+  file:
+    class: logging.FileHandler
+    filename: exec.log
+    encoding: utf-8
+    formatter: verbose
 formatters:
   basic:
     style: "%"
-    format: "%(asctime)s %(name)s : %(levelname)s : %(message)s"
+    format: "%(levelname)s %(message)s"
+  verbose:
+    style: "%"
+    format: "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
     datefmt: "%Y-%m-%d %H:%M:%S"
 loggers:
   debug:
-    handlers: [console]
+    handlers: [console, file]
     level: DEBUG
     propagate: False
 root:
