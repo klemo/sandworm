@@ -11,6 +11,9 @@ import yaml
 
 #------------------------------------------------------------------------------
 class TestRunner():
+    '''
+    Encapsulates functionalities for handling tests for single task.
+    '''
 
     #-------------------------------------------------------------------------- 
     def __init__(self, taskid):
@@ -27,7 +30,10 @@ class TestRunner():
         
     #--------------------------------------------------------------------------
     def analyze_testdata(self):
-        self.logger.info('// Checking testdata folder: {}'.format(
+        '''
+        Analyzes and parses tests from the testdata folder
+        '''
+        self.logger.info('// Checking task folder: {}'.format(
                 self.testdata_archive_path))
         if not os.path.isdir(self.testdata_archive_path):
             raise Exception('Not a directory: {}'.format(
@@ -116,8 +122,8 @@ class TestRunner():
     #--------------------------------------------------------------------------
     def eval_cfg(self, test, lang):
         '''
-        Evaluates configuration file for self.taskid and runs test
-        written in lang
+        Evaluates commands from the configuration file for self.taskid and runs
+        single test written in lang
         '''
         self.logger.info('// Test: {}'.format(test['name']))
         passed = True
@@ -172,13 +178,17 @@ class TestRunner():
 
     #--------------------------------------------------------------------------
     def eval_all(self, lang):
+        '''
+        Short for evaluation of all tests
+        '''
         for test in self.tests:
             self.eval_cfg(test, lang)
         
     #--------------------------------------------------------------------------
     def run(self, userid, archive, lang, only_integration=False):
         '''
-        Runs user task stored in an archive written in given lang 
+        Runs user task stored in an archive written in given lang with an
+        option for running only integration test
         '''
         self.logger.info('// Running tests for user {}'.format(userid))
         wdir = 'tmp'
@@ -201,11 +211,63 @@ class TestRunner():
             self.eval_all(lang)
 
 #------------------------------------------------------------------------------
-                
+class Exec():
+    '''
+    Main EXEC entry point. By default, locates task folders in
+    settings.HOST_TESTDATA_PATH and registers them. Use run function to run
+    tests for user's archive.
+    '''
+
+    #--------------------------------------------------------------------------
+    def __init__(self, testdata_path=None):
+        '''
+        testdata_path is the location of the test folders for each task
+        '''
+        self.logger = logging.getLogger('debug.{}'.format(
+                self.__class__.__name__))
+        if not testdata_path:
+            testdata_path = settings.HOST_TESTDATA_TASKS
+        self.testdata_path = testdata_path
+        self.logger.info('// Checking testdata folder: {}'.format(
+                self.testdata_path))
+        if not os.path.isdir(self.testdata_path):
+            raise Exception('TESTDATA_PATH not a directory: {}'.format(
+                    self.testdata_path))
+        self.test_runners = {}
+        for task_name in os.listdir(self.testdata_path):
+            self.logger.info('Found task: {}'.format(task_name))
+            try:
+                self.test_runners[task_name] = TestRunner(task_name)
+            except Exception as e:
+                self.logger.info(
+                    'Registering test runner for {} failed: {}'.format(
+                        task_name, e))
+
+    #--------------------------------------------------------------------------
+    def get_registered_tasks(self):
+        '''
+        Returns list of registered tasks
+        '''
+        return self.test_runners.keys()
+
+    #--------------------------------------------------------------------------
+    def run(self, taskid, userid, archive, lang, only_integration=False):
+        '''
+        Runs single task for given user archive written in lang with an
+        option for running only integration test
+        '''
+        test_runner = self.test_runners.get(taskid)
+        if test_runner:
+            return test_runner.run(userid, archive, lang)
+        else:
+            self.logger.info('Task runner for {} not registered'.format(
+                    taskid))
+
+#------------------------------------------------------------------------------
 if __name__=='__main__':
     with open('logging.yml', 'r') as f:
         config_dict = yaml.load(f)
         logging.config.dictConfig(config_dict)
-        taskid = 'lab1'
-        tr = TestRunner(taskid)
-        #tr.run('user1', 'lab.zip', 'python:3')
+        exec_ = Exec()
+        print(exec_.get_registered_tasks())
+        #exec_.run('lab1', 'user1', 'lab.zip', 'python:3')
