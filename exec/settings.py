@@ -1,3 +1,5 @@
+import os
+
 LANGS = {
     'python:2': {'ext': 'py',
                  'img': 'python:2',
@@ -7,4 +9,6 @@ LANGS = {
                  'cmd': 'python'},
     }
 
+HOST_TESTDATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  'testdata')
 CONTAINER_TESTDATA_PATH = '/testdata'

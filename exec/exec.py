@@ -19,9 +19,9 @@ class TestRunner():
                 self.__class__.__name__,
                 taskid))
         # locate testdata for given task
-        self.testdata_archive_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), 'testdata', 'labs',
-            self.taskid)
+        self.testdata_archive_path = os.path.join(settings.HOST_TESTDATA_PATH,
+                                                  'labs',
+                                                  self.taskid)
         self.cfg = []
         self.analyze_testdata()
         
@@ -184,7 +184,7 @@ class TestRunner():
         wdir = 'tmp'
         if not os.path.exists(wdir):
             os.makedirs(wdir)
-        user_archive_path = os.path.join('testdata',
+        user_archive_path = os.path.join(settings.HOST_TESTDATA_PATH,
                                          'user',
                                          userid,
                                          self.taskid,
