@@ -1,4 +1,5 @@
 #------------------------------------------------------------------------------
+# -*- coding: utf-8 -*-
 # exec entrypoint
 #------------------------------------------------------------------------------
 
@@ -8,6 +9,7 @@ import docker
 import settings
 import logging.config
 import yaml
+import pprint
 
 #------------------------------------------------------------------------------
 class TestRunner():
@@ -127,17 +129,21 @@ class TestRunner():
         '''
         self.logger.info('// Test: {}'.format(test['name']))
         passed = True
+        result = []
         last_result = None
         try:
             for line in self.cfg:
                 self.logger.info('Running command ' + line)
+                cmd_result = {}
                 parts = line.split()
                 option = parts[0]
                 # CWD
                 if option.upper() == 'CWD':
+                    cmd_result[option] = None
                     pass
                 # COMPILE
                 elif option.upper() == 'COMPILE':
+                    cmd_result[option] = None
                     pass
                 # RUN
                 elif option.upper() == 'RUN':
@@ -154,6 +160,7 @@ class TestRunner():
                             what,
                             input_filename,
                             lang)
+                    cmd_result[option] = last_result
                 # ASSERT
                 elif option.upper() == 'ASSERT':
                     # read expected output
@@ -170,19 +177,26 @@ class TestRunner():
                                     expected,
                                     last_result))
                             passed = False
+                            cmd_result[option] = {
+                                'assert': False,
+                                'expected': expected,
+                                'got': last_result}
                         else:
                             self.logger.info('Passed: True')
+                            cmd_result[option] = {'assert': True}
+                # append result of every command
+                result.append(cmd_result)
         except Exception as e:
             self.logger.error('eval_cfg:', exc_info=True)
             passed = False
+        return result
 
     #--------------------------------------------------------------------------
     def eval_all(self, lang):
         '''
         Short for evaluation of all tests
         '''
-        for test in self.tests:
-            self.eval_cfg(test, lang)
+        return [self.eval_cfg(test, lang) for test in self.tests]
         
     #--------------------------------------------------------------------------
     def run(self, userid, archive, lang, only_integration=False):
@@ -206,9 +220,9 @@ class TestRunner():
         except Exception as e:
             raise Exception('Extracting user archive: {}'.format(e))
         if only_integration:
-            self.eval_cfg('integration', lang)
+            return [self.eval_cfg('integration', lang)]
         else:
-            self.eval_all(lang)
+            return self.eval_all(lang)
 
 #------------------------------------------------------------------------------
 class Exec():
@@ -269,5 +283,4 @@ if __name__=='__main__':
         config_dict = yaml.load(f)
         logging.config.dictConfig(config_dict)
         exec_ = Exec()
-        print(exec_.get_registered_tasks())
-        #exec_.run('lab1', 'user1', 'lab.zip', 'python:3')
+        #pprint.pprint(exec_.run('lab1', 'user1', 'lab.zip', 'python:3'))
