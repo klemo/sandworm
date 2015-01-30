@@ -32,9 +32,19 @@ class TestExecore(unittest.TestCase):
     def test_get_registered_tasks(self):
         self.assertEqual(self._exec.get_registered_tasks(), ['task1'])
 
+    def test_run_integration(self):
+        result = self._exec.run('task1', 'user1', 'sum.zip', 'python:3',
+                                integration=True)
+        self.assertEqual(result['passed'], True)
+
     def test_run(self):
         result = self._exec.run('task1', 'user1', 'sum.zip', 'python:3')
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
+        for r in result:
+            if r['name'].endswith('_fail'):
+                self.assertEqual(r['passed'], False)
+            else:
+                self.assertEqual(r['passed'], True)
 
 #------------------------------------------------------------------------------
 

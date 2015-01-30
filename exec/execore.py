@@ -68,7 +68,7 @@ class TestRunner():
                 if test['name'] == 'integration':
                     integration_test = test
                     self.logger.info('Integration test: OK')
-                    self.tests.remove(integration_test)
+                    #self.tests.remove(integration_test)
                     break
             if not integration_test:
                 raise Exception('Integration test: Not found')
@@ -179,28 +179,45 @@ class TestRunner():
                                     last_result))
                             passed = False
                             cmd_result[option] = {
-                                'assert': False,
+                                'passed': False,
                                 'expected': expected,
                                 'got': last_result}
                         else:
                             self.logger.info('Passed: True')
-                            cmd_result[option] = {'assert': True}
+                            cmd_result[option] = {'passed': True}
                 # append result of every command
                 result.append(cmd_result)
         except Exception as e:
             self.logger.error('eval_cfg:', exc_info=True)
             passed = False
-        return result
+        return result, passed
 
     #--------------------------------------------------------------------------
     def eval_all(self, lang):
         '''
         Short for evaluation of all tests
         '''
-        return [self.eval_cfg(test, lang) for test in self.tests]
+        for test in self.tests:
+            result, passed = self.eval_cfg(test, lang)
+            yield {'name': test['name'],
+                   'result': result,
+                   'passed': passed}
+
+    #--------------------------------------------------------------------------
+    def eval_integration(self, lang):
+        '''
+        Short for evaluation of all tests
+        '''
+        for test in self.tests:
+            if test['name'] == 'integration':
+                result, passed = self.eval_cfg(test, lang)
+                return {'name': test['name'],
+                       'result': result,
+                       'passed': passed}
+        return None
         
     #--------------------------------------------------------------------------
-    def run(self, userid, archive, lang, only_integration=False):
+    def run(self, userid, archive, lang, integration=False):
         '''
         Runs user task stored in an archive written in given lang with an
         option for running only integration test
@@ -219,10 +236,10 @@ class TestRunner():
                 self.logger.info('Extracting user archive: OK')
         except Exception as e:
             raise Exception('Extracting user archive: {}'.format(e))
-        if only_integration:
-            return [self.eval_cfg('integration', lang)]
+        if integration:
+            return self.eval_integration(lang)
         else:
-            return self.eval_all(lang)
+            return list(self.eval_all(lang))
 
 #------------------------------------------------------------------------------
 class Exec():
@@ -275,14 +292,14 @@ class Exec():
         return self.test_runners.keys()
 
     #--------------------------------------------------------------------------
-    def run(self, taskid, userid, archive, lang, only_integration=False):
+    def run(self, taskid, userid, archive, lang, integration=False):
         '''
         Runs single task for given user archive written in lang with an
         option for running only integration test
         '''
         test_runner = self.test_runners.get(taskid)
         if test_runner:
-            return test_runner.run(userid, archive, lang)
+            return test_runner.run(userid, archive, lang, integration)
         else:
             self.logger.info('Task runner for {} not registered'.format(
                     taskid))
@@ -293,4 +310,5 @@ if __name__=='__main__':
         config_dict = yaml.load(f)
         logging.config.dictConfig(config_dict)
         exec_ = Exec(testdata_path='fixtures/testdata')
-        pprint.pprint(exec_.run('task1', 'user1', 'sum.zip', 'python:3'))
+        pprint.pprint(exec_.run('task1', 'user1', 'sum.zip', 'python:3',
+                                integration=True))
