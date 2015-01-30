@@ -10,6 +10,5 @@ LANGS = {
     }
 
 HOST_TESTDATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                  'testdata')
-HOST_TESTDATA_TASKS = os.path.join(HOST_TESTDATA_PATH, 'labs')
+                                  'fixtures/testdata')
 CONTAINER_TESTDATA_PATH = '/testdata'

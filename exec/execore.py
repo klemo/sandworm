@@ -18,14 +18,15 @@ class TestRunner():
     '''
 
     #-------------------------------------------------------------------------- 
-    def __init__(self, taskid):
+    def __init__(self, taskid, testdata_tasks_path, testdata_users_path):
         self.taskid = taskid # task to evaluate
+        self.testdata_tasks_path = testdata_tasks_path
+        self.testdata_users_path = testdata_users_path
         self.logger = logging.getLogger('debug.{}.{}'.format(
                 self.__class__.__name__,
                 taskid))
         # locate testdata for given task
-        self.testdata_archive_path = os.path.join(settings.HOST_TESTDATA_PATH,
-                                                  'labs',
+        self.testdata_archive_path = os.path.join(self.testdata_tasks_path,
                                                   self.taskid)
         self.cfg = []
         self.analyze_testdata()
@@ -159,7 +160,7 @@ class TestRunner():
                             os.path.abspath('tmp'),
                             what,
                             input_filename,
-                            lang)
+                            lang).strip()
                     cmd_result[option] = last_result
                 # ASSERT
                 elif option.upper() == 'ASSERT':
@@ -169,11 +170,11 @@ class TestRunner():
                         test['name'],
                         test[parts[1]])
                     with open(output_filename, 'r') as fout:
-                        expected = fout.read()
+                        expected = fout.read().strip()
                         # and check for equality
-                        if last_result.strip() != expected.strip():
+                        if last_result != expected:
                             self.logger.info('Passed: False')
-                            self.logger.info('Expected:\n{}\nGot:\n{}\n'.format(
+                            self.logger.info('Expected:\n{}\nGot:\n{}'.format(
                                     expected,
                                     last_result))
                             passed = False
@@ -208,8 +209,7 @@ class TestRunner():
         wdir = 'tmp'
         if not os.path.exists(wdir):
             os.makedirs(wdir)
-        user_archive_path = os.path.join(settings.HOST_TESTDATA_PATH,
-                                         'user',
+        user_archive_path = os.path.join(self.testdata_users_path,
                                          userid,
                                          self.taskid,
                                          archive)
@@ -240,22 +240,32 @@ class Exec():
         self.logger = logging.getLogger('debug.{}'.format(
                 self.__class__.__name__))
         if not testdata_path:
-            testdata_path = settings.HOST_TESTDATA_TASKS
-        self.testdata_path = testdata_path
+            testdata_path = settings.HOST_TESTDATA_PATH
+        self.testdata_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            testdata_path)                
+        self.testdata_tasks_path = os.path.join(self.testdata_path, 'tasks')
+        self.testdata_users_path = os.path.join(self.testdata_path, 'users')
         self.logger.info('// Checking testdata folder: {}'.format(
                 self.testdata_path))
         if not os.path.isdir(self.testdata_path):
             raise Exception('TESTDATA_PATH not a directory: {}'.format(
                     self.testdata_path))
+        # parse folder structure for tasks
         self.test_runners = {}
-        for task_name in os.listdir(self.testdata_path):
+        for task_name in os.listdir(self.testdata_tasks_path):
             self.logger.info('Found task: {}'.format(task_name))
             try:
-                self.test_runners[task_name] = TestRunner(task_name)
+                self.test_runners[task_name] = TestRunner(
+                    task_name,
+                    self.testdata_tasks_path,
+                    self.testdata_users_path)
             except Exception as e:
                 self.logger.info(
                     'Registering test runner for {} failed: {}'.format(
                         task_name, e))
+        if not self.test_runners:
+            self.logger.info('No tasks found')
 
     #--------------------------------------------------------------------------
     def get_registered_tasks(self):
@@ -282,5 +292,5 @@ if __name__=='__main__':
     with open('logging.yml', 'r') as f:
         config_dict = yaml.load(f)
         logging.config.dictConfig(config_dict)
-        exec_ = Exec()
-        #pprint.pprint(exec_.run('lab1', 'user1', 'lab.zip', 'python:3'))
+        exec_ = Exec(testdata_path='fixtures/testdata')
+        pprint.pprint(exec_.run('task1', 'user1', 'sum.zip', 'python:3'))

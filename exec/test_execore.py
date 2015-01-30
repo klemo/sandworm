@@ -12,30 +12,29 @@ class TestExecoreMalformed(unittest.TestCase):
 
     def test_nonexisting_dir(self):
         with self.assertRaises(Exception):
-            execore.Exec(testdata_path='/fixtures/invalid/nonexisting')
+            execore.Exec(testdata_path='fixtures/invalid/nonexisting')
 
     def test_empty_dir(self):
         with self.assertRaises(Exception):
-            execore.Exec(testdata_path='/fixtures/invalid/empty')
+            execore.Exec(testdata_path='fixtures/invalid/empty')
 
     def test_nocfg(self):
         with self.assertRaises(Exception):
-            execore.Exec(testdata_path='/fixtures/invalid/nocfg')
+            execore.Exec(testdata_path='fixtures/invalid/nocfg/testdata')
 
 #------------------------------------------------------------------------------
 
 class TestExecore(unittest.TestCase):
     
     def setUp(self):
-        self._exec = execore.Exec()
+        self._exec = execore.Exec(testdata_path='fixtures/testdata')
 
     def test_get_registered_tasks(self):
-        self.assertEqual(self._exec.get_registered_tasks(), ['lab1'])
+        self.assertEqual(self._exec.get_registered_tasks(), ['task1'])
 
     def test_run(self):
-        pass
-        #result = self._exec.run('lab1', 'user1', 'lab.zip', 'python:3')
-        #self.assertEqual(len(result), 30)
+        result = self._exec.run('task1', 'user1', 'sum.zip', 'python:3')
+        self.assertEqual(len(result), 3)
 
 #------------------------------------------------------------------------------
 
