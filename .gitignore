@@ -1,7 +1,6 @@
 *~
 *.pyc
 *.log
-*.zip
 grader/tmp/*
 exec/tmp/*
 creds.py

@@ -6,10 +6,11 @@
 import zipfile
 import os
 import docker
-import settings
 import logging.config
 import yaml
 import pprint
+import settings
+import container
 
 #------------------------------------------------------------------------------
 class TestRunner():
@@ -132,21 +133,25 @@ class TestRunner():
         passed = True
         result = []
         last_result = None
+        cntnr = container.Container(self.testdata_archive_path,
+                                    os.path.abspath('tmp'),
+                                    lang)
         try:
             for line in self.cfg:
                 self.logger.info('Running command ' + line)
                 cmd_result = {}
                 parts = line.split()
                 option = parts[0]
-                # CWD
+                # CWD ---------------------------------------------------------
                 if option.upper() == 'CWD':
                     cmd_result[option] = None
                     pass
-                # COMPILE
+                # COMPILE -----------------------------------------------------
                 elif option.upper() == 'COMPILE':
-                    cmd_result[option] = None
+                    last_result = cntnr.cmd_compile(parts[1])
+                    cmd_result[option] = last_result
                     pass
-                # RUN
+                # RUN ---------------------------------------------------------
                 elif option.upper() == 'RUN':
                     what = parts[1]
                     timeout = int(parts[2])
@@ -156,13 +161,10 @@ class TestRunner():
                             settings.CONTAINER_TESTDATA_PATH,
                             test['name'],
                             test[parts[3]])
-                        last_result = self.run_in_docker(
-                            os.path.abspath('tmp'),
-                            what,
-                            input_filename,
-                            lang).strip()
+                        last_result = cntnr.cmd_run(what,
+                                                    input_filename).strip()
                     cmd_result[option] = last_result
-                # ASSERT
+                # ASSERT ------------------------------------------------------
                 elif option.upper() == 'ASSERT':
                     # read expected output
                     output_filename = os.path.join(
@@ -185,6 +187,7 @@ class TestRunner():
                         else:
                             self.logger.info('Passed: True')
                             cmd_result[option] = {'passed': True}
+                # -------------------------------------------------------------
                 # append result of every command
                 result.append(cmd_result)
         except Exception as e:
@@ -310,5 +313,7 @@ if __name__=='__main__':
         config_dict = yaml.load(f)
         logging.config.dictConfig(config_dict)
         exec_ = Exec(testdata_path='fixtures/testdata')
-        pprint.pprint(exec_.run('task1', 'user1', 'sum.zip', 'python:3',
-                                integration=True))
+        # pprint.pprint(exec_.run('task1', 'user1', 'sum.zip', 'python:3',
+        #                         integration=True))
+        pprint.pprint(exec_.run('task1', 'user2', 'sum.zip', 'c'))
+                                #integration=True))

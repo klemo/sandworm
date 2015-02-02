@@ -3,10 +3,20 @@ import os
 LANGS = {
     'python:2': {'ext': 'py',
                  'img': 'python:2',
-                 'cmd': 'python'},
+                 'cmd':
+                     lambda progname, ext, inputfile: 'python {}.{} < {}'.format(progname, ext, inputfile),
+                 'compile': None},
     'python:3': {'ext': 'py',
                  'img': 'python:3',
-                 'cmd': 'python'},
+                 'cmd':
+                     lambda progname, ext, inputfile: 'python {}.{} < {}'.format(progname, ext, inputfile),
+                 'compile': None},
+    'c':        {'ext': 'c',
+                 'img': 'gcc:4.9',
+                 'cmd':
+                     lambda progname, ext, inputfile: './a.out < {}'.format(inputfile),
+                 'compile':
+                     lambda cfile, ext: 'gcc -O2 -W -Wall {}.{}'.format(cfile, ext)},
     }
 
 HOST_TESTDATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
