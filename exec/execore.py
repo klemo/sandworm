@@ -146,12 +146,12 @@ class TestRunner():
                 # CWD ---------------------------------------------------------
                 if option.upper() == 'CWD':
                     cmd_result[option] = None
-                    pass
                 # COMPILE -----------------------------------------------------
                 elif option.upper() == 'COMPILE':
-                    last_result = cntnr.cmd_compile(parts[1])
-                    cmd_result[option] = last_result
-                    pass
+                    out, err = cntnr.cmd_compile(parts[1])
+                    if err:
+                        cmd_result[option] = err
+                        passed=False
                 # RUN ---------------------------------------------------------
                 elif option.upper() == 'RUN':
                     what = parts[1]
@@ -162,9 +162,13 @@ class TestRunner():
                             settings.CONTAINER_TESTDATA_PATH,
                             test['name'],
                             test[parts[3]])
-                        last_result = cntnr.cmd_run(what,
-                                                    input_filename).strip()
-                    cmd_result[option] = last_result
+                        out, err = cntnr.cmd_run(what, input_filename)
+                        if err:
+                            cmd_result[option] = err
+                            passed=False
+                        else:
+                            cmd_result[option] = out
+                            last_result = out
                 # ASSERT ------------------------------------------------------
                 elif option.upper() == 'ASSERT':
                     # read expected output
@@ -191,6 +195,9 @@ class TestRunner():
                 # -------------------------------------------------------------
                 # append result of every command
                 result.append(cmd_result)
+                if not passed:
+                    self.logger.info('Passed: False')
+                    break
         except Exception as e:
             self.logger.error('eval_cfg:', exc_info=True)
             passed = False
@@ -315,9 +322,11 @@ if __name__=='__main__':
         config_dict = yaml.load(f)
         logging.config.dictConfig(config_dict)
         exec_ = Exec(testdata_path='fixtures/testdata')
-        # pprint.pprint(exec_.run('task1', 'user1', 'sum.zip', 'python:3',
-        #                         integration=True))
+        #pprint.pprint(exec_.run('task1', 'user1', 'sum.zip', 'python:3'))
+                                #integration=True))
         #pprint.pprint(exec_.run('task1', 'user2', 'sum.zip', 'c'))
                                 #integration=True))
         #pprint.pprint(exec_.run('task1', 'user3', 'sum.zip', 'c++'))
-        pprint.pprint(exec_.run('task1', 'user4', 'Sum.zip', 'java:7'))
+        #pprint.pprint(exec_.run('task1', 'user4', 'Sum.zip', 'java:7'))
+        pprint.pprint(exec_.run('task1', 'user_compile_err', 'Sum.zip',
+                                'java:7', True))

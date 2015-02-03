@@ -22,7 +22,7 @@ class Container():
         self.lang = lang
         self.dckr = docker.Client(base_url='unix://var/run/docker.sock',
                                   version='1.15')
-
+        
     #--------------------------------------------------------------------------
     def create(self, cmd):
         '''
@@ -47,8 +47,9 @@ class Container():
         #                          cmd='/bin/bash -c "{}"'.format(main_cmd))
         self.dckr.wait(cid)
         self.dckr.stop(cid)
-        output = self.dckr.logs(cid)
-        return output
+        stdout = self.dckr.logs(cid, stdout=True, stderr=False)
+        stderr = self.dckr.logs(cid, stdout=False, stderr=True)
+        return stdout.strip(), stderr.strip()
 
     #--------------------------------------------------------------------------
     def remove(self):
@@ -77,5 +78,5 @@ class Container():
                               settings.LANGS[self.lang]['ext'])
             output = self.create(cmd)
             self.remove()
-            return output or None
-        return None
+            return output
+        return (None, None)

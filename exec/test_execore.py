@@ -46,6 +46,13 @@ class TestExecore(unittest.TestCase):
             else:
                 self.assertEqual(r['passed'], True)
 
+    # Compile error
+    def test_compile_error(self):
+        result = self._exec.run('task1', 'user_compile_err', 'Sum.zip',
+                                'java:7', True)
+        self.assertEqual(result['passed'], False)
+        self.assertGreater(result['result'][0]['COMPILE'].find('error'), -1)
+
     # Python tests
     def test_run_integration_python(self):
         self.run_integration_('task1', 'user1', 'sum.zip', 'python:3')
