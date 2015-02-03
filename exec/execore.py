@@ -162,7 +162,7 @@ class TestRunner():
                             settings.CONTAINER_TESTDATA_PATH,
                             test['name'],
                             test[parts[3]])
-                        out, err = cntnr.cmd_run(what, input_filename)
+                        out, err = cntnr.cmd_run(what, input_filename, timeout)
                         if err:
                             cmd_result[option] = err
                             passed=False
@@ -326,7 +326,7 @@ if __name__=='__main__':
                                 #integration=True))
         #pprint.pprint(exec_.run('task1', 'user2', 'sum.zip', 'c'))
                                 #integration=True))
-        #pprint.pprint(exec_.run('task1', 'user3', 'sum.zip', 'c++'))
+        pprint.pprint(exec_.run('task1', 'user3', 'sum.zip', 'c++'))
         #pprint.pprint(exec_.run('task1', 'user4', 'Sum.zip', 'java:7'))
-        pprint.pprint(exec_.run('task1', 'user_compile_err', 'Sum.zip',
-                                'java:7', True))
+        #pprint.pprint(exec_.run('task1', 'user_compile_err', 'Sum.zip',
+        #                        'java:7', True))

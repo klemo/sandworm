@@ -24,7 +24,7 @@ class Container():
                                   version='1.15')
         
     #--------------------------------------------------------------------------
-    def create(self, cmd):
+    def create(self, cmd, timeout):
         '''
         Creates container for every command. Should refactor this to use
         EXECUTE command... Also, writes to volume -- should use COMMIT
@@ -45,7 +45,7 @@ class Container():
                     'bind': settings.CONTAINER_TESTDATA_PATH, 'ro': True}})
         # resp = self.dckr.execute(cid,
         #                          cmd='/bin/bash -c "{}"'.format(main_cmd))
-        self.dckr.wait(cid)
+        self.dckr.wait(cid, timeout=timeout)
         self.dckr.stop(cid)
         stdout = self.dckr.logs(cid, stdout=True, stderr=False)
         stderr = self.dckr.logs(cid, stdout=False, stderr=True)
@@ -56,19 +56,19 @@ class Container():
         self.dckr.remove_container(self.container.get('Id'))
 
     #--------------------------------------------------------------------------
-    def cmd_run(self, progname, input_file):
+    def cmd_run(self, progname, input_file, timeout=None):
         '''
         RUN command
         '''
         cmd = settings.LANGS[self.lang]['cmd'](progname,
                                                settings.LANGS[self.lang]['ext'],
                                                input_file)
-        output = self.create(cmd)
+        output = self.create(cmd, timeout)
         self.remove()
         return output
 
     #--------------------------------------------------------------------------
-    def cmd_compile(self, input_file):
+    def cmd_compile(self, input_file, timeout=None):
         '''
         COMPILE command
         '''
@@ -76,7 +76,7 @@ class Container():
         if compile_cmd:
             cmd = compile_cmd(input_file,
                               settings.LANGS[self.lang]['ext'])
-            output = self.create(cmd)
+            output = self.create(cmd, timeout)
             self.remove()
             return output
         return (None, None)
