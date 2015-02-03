@@ -8,6 +8,7 @@ import os
 import docker
 import logging.config
 import yaml
+import shutil
 import pprint
 import settings
 import container
@@ -227,7 +228,8 @@ class TestRunner():
         '''
         self.logger.info('// Running tests for user {}'.format(userid))
         wdir = 'tmp'
-        if not os.path.exists(wdir):
+        if os.path.exists(wdir):
+            shutil.rmtree(wdir)
             os.makedirs(wdir)
         user_archive_path = os.path.join(self.testdata_users_path,
                                          userid,
@@ -317,4 +319,5 @@ if __name__=='__main__':
         #                         integration=True))
         #pprint.pprint(exec_.run('task1', 'user2', 'sum.zip', 'c'))
                                 #integration=True))
-        pprint.pprint(exec_.run('task1', 'user3', 'sum.zip', 'c++'))
+        #pprint.pprint(exec_.run('task1', 'user3', 'sum.zip', 'c++'))
+        pprint.pprint(exec_.run('task1', 'user4', 'Sum.zip', 'java:7'))
