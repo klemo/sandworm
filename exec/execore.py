@@ -315,5 +315,6 @@ if __name__=='__main__':
         exec_ = Exec(testdata_path='fixtures/testdata')
         # pprint.pprint(exec_.run('task1', 'user1', 'sum.zip', 'python:3',
         #                         integration=True))
-        pprint.pprint(exec_.run('task1', 'user2', 'sum.zip', 'c'))
+        #pprint.pprint(exec_.run('task1', 'user2', 'sum.zip', 'c'))
                                 #integration=True))
+        pprint.pprint(exec_.run('task1', 'user3', 'sum.zip', 'c++'))

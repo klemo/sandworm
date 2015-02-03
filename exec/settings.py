@@ -16,7 +16,13 @@ LANGS = {
                  'cmd':
                      lambda progname, ext, inputfile: './a.out < {}'.format(inputfile),
                  'compile':
-                     lambda cfile, ext: 'gcc -O2 -W -Wall {}.{}'.format(cfile, ext)},
+                     lambda inputfile, ext: 'gcc -O2 -W -Wall {}.{}'.format(inputfile, ext)},
+    'c++':      {'ext': 'cpp',
+                 'img': 'gcc:4.9',
+                 'cmd':
+                     lambda progname, ext, inputfile: './a.out < {}'.format(inputfile),
+                 'compile':
+                     lambda inputfile, ext: 'g++ -std=c++0x -O2 -W -Wall {}.{}'.format(inputfile, ext)},
     }
 
 HOST_TESTDATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),

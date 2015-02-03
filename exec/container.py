@@ -37,16 +37,17 @@ class Container():
             command='/bin/bash -c "{}"'.format(cmd),
             network_disabled=True,
             detach=True)
+        cid = self.container.get('Id')
         resp = self.dckr.start(
-            self.container.get('Id'),
+            cid,
             binds={self.user_archive: {'bind': '/tmp'},
                    self.testdata_archive_path: {
                     'bind': settings.CONTAINER_TESTDATA_PATH, 'ro': True}})
-        # resp = self.dckr.execute(self.container.get('Id'),
+        # resp = self.dckr.execute(cid,
         #                          cmd='/bin/bash -c "{}"'.format(main_cmd))
-        self.dckr.wait(self.container.get('Id'))
-        self.dckr.stop(self.container.get('Id'))
-        output = self.dckr.logs(self.container.get('Id'))
+        self.dckr.wait(cid)
+        self.dckr.stop(cid)
+        output = self.dckr.logs(cid)
         return output
 
     #--------------------------------------------------------------------------
@@ -58,10 +59,9 @@ class Container():
         '''
         RUN command
         '''
-        cmd = settings.LANGS[self.lang]['cmd'](
-            progname,
-            settings.LANGS[self.lang]['ext'],
-            input_file)
+        cmd = settings.LANGS[self.lang]['cmd'](progname,
+                                               settings.LANGS[self.lang]['ext'],
+                                               input_file)
         output = self.create(cmd)
         self.remove()
         return output
