@@ -9,24 +9,6 @@ var sandwormControllers = angular.module('sandwormControllers', [
     'ngCookies',
 ])
 
-/** LabResultsCtrl @description displays lab details for admin */
-.controller('AdminLabDetailsCtrl', ['$stateParams', 'AdminLabService', '$state', function($stateParams, LabService, $state) {
-    var self = this;
-    self.lab = LabService.get({labId: $stateParams.labId});
-    self.deleteLab = function() {
-        if (confirm('Remove this lab?')) {
-            LabService.remove({labId: $stateParams.labId}).$promise.then(
-                function(lab) {
-                    $state.go('admin-labs');
-                },
-                function(err) {
-                    self.errorMessage = err;
-                });
-        };
-    }
-
-}])
-
 /** AdminResultsCtrl @description displays all results on admin pages */
 .controller('AdminResultsCtrl', ['$stateParams', 'AdminResultsService',
                                  function($stateParams, AdminResultsService) {

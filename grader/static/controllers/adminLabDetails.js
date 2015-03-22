@@ -4,7 +4,7 @@
 
     angular
         .module('sandwormControllers')
-        .controller('AdminLabCtrl', AdminLabDetailsCtrl);
+        .controller('AdminLabDetailsCtrl', AdminLabDetailsCtrl);
 
     function AdminLabDetailsCtrl(AdminLabService, $stateParams, $state) {
 
@@ -20,7 +20,7 @@
                     function (err) {
                         self.errorMessage = err;
                     });
-            };
+            }
         }
 
     }
