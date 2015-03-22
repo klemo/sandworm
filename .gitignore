@@ -4,3 +4,8 @@
 grader/tmp/*
 exec/tmp/*
 creds.py
+
+# Intellij
+.idea/
+*.iml
+*.iws
