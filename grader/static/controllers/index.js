@@ -4,10 +4,10 @@
 
     angular
         .module('sandwormControllers')
-        .controller('LoginCtrl', LoginCtrl);
+        .controller('IndexCtrl', IndexCtrl);
 
     /** AdminUsersCtrl @description displays users info on admin pages */
-    function LoginCtrl(UserService, $state) {
+    function IndexCtrl(UserService, $state) {
         var self = this;
         self.userService = UserService;
         if (self.userService.isLoggedIn) {
