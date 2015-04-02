@@ -9,7 +9,6 @@
     function AdminLabDetailsCtrl(AdminLabService, $stateParams, $state) {
 
         var self = this;
-        console.log($stateParams);
         self.lab = AdminLabService.get({labId: $stateParams.labId});
         self.deleteLab = function () {
             if (confirm('Remove this lab?')) {

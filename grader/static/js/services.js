@@ -10,7 +10,7 @@ var sandwormServices = angular.module('sandwormServices', [
 ])
 .constant('API', {
     user: 'api/v1',
-    admin: 'api/v1/admin',
+    admin: 'api/v1/admin'
 })
 
 /* Admin services */

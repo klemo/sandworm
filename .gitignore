@@ -5,7 +5,10 @@ grader/tmp/*
 exec/tmp/*
 creds.py
 
-# Intellij
+**/.idea/
 .idea/
 *.iml
 *.iws
+idea/workspace.xml
+idea/tasks.xml
+.idea/dictionaries

@@ -9,7 +9,6 @@
     function AdminLabCtrl(AdminLabService) {
 
         var self = this;
-        console.log('about to call service query...');
         self.labs = AdminLabService.query();
 
         /* JS Date helpers */
