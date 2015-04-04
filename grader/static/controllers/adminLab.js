@@ -32,10 +32,10 @@
             }
         };
         self.submit = function() {
-            LabService.save({labId: ''}, self.lab).$promise.then(
+            AdminLabService.save({labId: ''}, self.lab).$promise.then(
                 function(lab) {
                     //self.labs.push(lab);
-                    self.labs = LabService.query();
+                    self.labs = AdminLabService.query();
                     self.infoMessage = 'Lab created';
                 },
                 function(err) {
