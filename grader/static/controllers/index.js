@@ -7,9 +7,9 @@
         .controller('IndexCtrl', IndexCtrl);
 
     /** AdminUsersCtrl @description displays users info on admin pages */
-    function IndexCtrl(UserService, $state) {
+    function IndexCtrl($state, authentication) {
         var self = this;
-        self.userService = UserService;
+        self.userService = authentication;
         if (self.userService.isLoggedIn) {
             if (self.userService.currentUser.role == 'admin') {
                 $state.go('admin-labs');

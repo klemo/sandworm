@@ -18,7 +18,7 @@ var sandworm = angular.module('sandworm', [
         url: '/',
         data: {
             isPublic: true,
-            access: '*',
+            access: '*'
         },
         views: {
             'uir-view-nav': {
@@ -34,7 +34,7 @@ var sandworm = angular.module('sandworm', [
         url: '/login',
         data: {
             isPublic: true,
-            access: '*',
+            access: '*'
         },
         views: {
             'uir-view-nav': {
@@ -50,7 +50,7 @@ var sandworm = angular.module('sandworm', [
         url: '/labs',
         data: {
             isPublic: false,
-            access: 'user',
+            access: 'user'
         },
         views: {
             'uir-view-nav': {
@@ -65,7 +65,7 @@ var sandworm = angular.module('sandworm', [
         url: '/labs/:labId',
         data: {
             isPublic: false,
-            access: 'user',
+            access: 'user'
         },
         views: {
             'uir-view-nav': {
@@ -81,7 +81,7 @@ var sandworm = angular.module('sandworm', [
         url: '/admin/labs',
         data: {
             isPublic: false,
-            access: 'admin',
+            access: 'admin'
         },
         views: {
             'uir-view-nav': {
@@ -149,8 +149,8 @@ var sandworm = angular.module('sandworm', [
         }
     });
     
-}).run(['$rootScope', '$location', '$http', '$cookies', '$state', '$q', '$socket', 'UserService',
-        function($rootScope, $location, $http, $cookies, $state, $q, $socket, UserService) {
+}).run(['$rootScope', '$location', '$http', '$cookies', '$state', '$q', '$socket', 'authentication',
+        function($rootScope, $location, $http, $cookies, $state, $q, $socket, authentication) {
 
     /* set xsrf header */
     $http.defaults.headers['post']['X-XSRFToken'] = $cookies['_xsrf'];
@@ -160,9 +160,9 @@ var sandworm = angular.module('sandworm', [
         /* prevent user from navigating to non-authorized or private resource
          * warn: client-side only! */
         var evv = event;
-        UserService.user().then(
+        authentication.user().then(
             function(success) {
-                if (next.data.access !== '*' && next.data.access !== UserService.currentUser.role) {
+                if (next.data.access !== '*' && next.data.access !== authentication.currentUser.role) {
                     $state.go('index');
                 }
             },

@@ -7,9 +7,9 @@
         .controller('LabDetailsCtrl', LabDetailsCtrl);
 
     /** LabDetailsCtrl @description displays lab details */
-    function LabDetailsCtrl($stateParams, uService, FileUploader, $scope, $cookies) {
+    function LabDetailsCtrl($stateParams, UserService, FileUploader, $scope, $cookies) {
         var self = this;
-        self.lab = uService.getListOfLabs().get({labId: $stateParams.labId}, function(lab) {
+        self.lab = UserService.getListOfLabs().get({labId: $stateParams.labId}, function(lab) {
             //lab.isOver = lab.end < Date.now();
         });
 
