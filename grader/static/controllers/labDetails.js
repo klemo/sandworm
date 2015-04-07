@@ -7,9 +7,9 @@
         .controller('LabDetailsCtrl', LabDetailsCtrl);
 
     /** LabDetailsCtrl @description displays lab details */
-    function LabDetailsCtrl($stateParams, LabService, FileUploader, $scope, $cookies, $socket) {
+    function LabDetailsCtrl($stateParams, uService, FileUploader, $scope, $cookies) {
         var self = this;
-        self.lab = LabService.get({labId: $stateParams.labId}, function(lab) {
+        self.lab = uService.getListOfLabs().get({labId: $stateParams.labId}, function(lab) {
             //lab.isOver = lab.end < Date.now();
         });
 
@@ -40,7 +40,7 @@
                     default:
                         console.log('WS unknown event', msg);
                 }
-            };
+            }
         };
 
         // Handle file uploading
@@ -64,7 +64,7 @@
                 //self.uploader.addToQueue( );
             } else if (filter.name === 'zipFilter') {
                 self.errorMessage = 'Must be zip archive!';
-            };
+            }
         };
         self.uploader.onAfterAddingFile = function(fileItem) {
             self.errorMessage = '';

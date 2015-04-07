@@ -6,13 +6,13 @@
         .module('sandwormControllers')
         .controller('AdminLabDetailsCtrl', AdminLabDetailsCtrl);
 
-    function AdminLabDetailsCtrl(AdminLabService, $stateParams, $state) {
+    function AdminLabDetailsCtrl(adminService, $stateParams, $state) {
 
         var self = this;
-        self.lab = AdminLabService.get({labId: $stateParams.labId});
+        self.lab = adminService.getListOfLabs().get({labId: $stateParams.labId});
         self.deleteLab = function () {
             if (confirm('Remove this lab?')) {
-                AdminLabService.remove({labId: $stateParams.labId}).$promise.then(
+                adminService.getListOfLabs().remove({labId: $stateParams.labId}).$promise.then(
                     function (lab) {
                         $state.go('admin-labs');
                     },

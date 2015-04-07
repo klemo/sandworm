@@ -96,7 +96,7 @@ var sandworm = angular.module('sandworm', [
         url: '/admin/labs/:labId',
         data: {
             isPublic: false,
-            access: 'admin',
+            access: 'admin'
         },
         views: {
             'uir-view-nav': {
@@ -111,7 +111,7 @@ var sandworm = angular.module('sandworm', [
         url: '/admin/results',
         data: {
             isPublic: false,
-            access: 'admin',
+            access: 'admin'
         },
         views: {
             'uir-view-nav': {
@@ -126,7 +126,7 @@ var sandworm = angular.module('sandworm', [
         url: '/admin/users',
         data: {
             isPublic: false,
-            access: 'admin',
+            access: 'admin'
         },
         views: {
             'uir-view-nav': {

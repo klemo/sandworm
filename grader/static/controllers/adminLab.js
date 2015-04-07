@@ -6,10 +6,10 @@
         .module('sandwormControllers')
         .controller('AdminLabCtrl', AdminLabCtrl);
 
-    function AdminLabCtrl(AdminLabService) {
+    function AdminLabCtrl(adminService) {
 
         var self = this;
-        self.labs = AdminLabService.query();
+        self.labs = adminService.getListOfLabs().query();
 
         /* JS Date helpers */
         var _n = new Date();
@@ -32,10 +32,10 @@
             }
         };
         self.submit = function() {
-            AdminLabService.save({labId: ''}, self.lab).$promise.then(
+            adminService.getListOfLabs().save({labId: ''}, self.lab).$promise.then(
                 function(lab) {
                     //self.labs.push(lab);
-                    self.labs = AdminLabService.query();
+                    self.labs = adminService.getListOfLabs().query();
                     self.infoMessage = 'Lab created';
                 },
                 function(err) {

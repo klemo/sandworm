@@ -7,10 +7,10 @@
         .controller('AdminResultsCtrl', AdminResultsCtrl);
 
     /** AdminResultsCtrl @description displays all results on admin pages */
-    function AdminResultsCtrl(AdminResultsService) {
+    function AdminResultsCtrl(adminService) {
 
         var self = this;
-        self.results = AdminResultsService.query()
+        self.results = adminService.getAllScoresAndResults().query()
 
     }
 

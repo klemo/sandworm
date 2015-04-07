@@ -1,34 +1,52 @@
-(function() {
+(function () {
     'use strict';
 
     angular
         .module('sandwormServices')
-        .factory('adminService', AdminLabService);
+        .factory('adminService', AdminService);
 
     /**
      * ImpactUtils is used as service that knows how to work with impacts.
      */
-    function AdminLabService($resource, API) {
+    function AdminService($resource, API) {
         var functionalities = {
-            getListOfLabs: getListOfLabs
+            getListOfLabs: getListOfLabs,
+            getAllScoresAndResults: getAllScoresAndResults,
+            getAllUsers: getAllUsers
         };
 
         /** @returns list of labs */
         function getListOfLabs() {
             return $resource(API.admin + '/labs/:labId', {}, {
-                query: {method: 'GET',
+                query: {
+                    method: 'GET',
                     params: {labId: ''},
-                    isArray: true}
+                    isArray: true
+                }
             });
         }
 
-//    .factory('AdminLabService', ['$resource', 'API', function($resource, API) {
-//            return $resource(API.admin + '/labs/:labId', {}, {
-//                query: {method: 'GET',
-//                    params: {labId: ''},
-//                    isArray: true}
-//            });
-//        }])
+        /**  @returns all scores and results */
+        function getAllScoresAndResults() {
+            return $resource(API.admin + '/results', {}, {
+                query: {
+                    method: 'GET',
+                    params: {},
+                    isArray: false
+                }
+            });
+        }
+
+        /**  @returns all users */
+        function getAllUsers() {
+            return $resource(API.admin + '/users', {}, {
+                query: {
+                    method: 'GET',
+                    params: {},
+                    isArray: true
+                }
+            });
+        }
 
 
         return functionalities;

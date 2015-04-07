@@ -13,42 +13,9 @@ var sandwormServices = angular.module('sandwormServices', [
     admin: 'api/v1/admin'
 })
 
-/* Admin services */
-/** AdminLabService @returns list of labs */
-.factory('AdminLabService', ['$resource', 'API', function($resource, API) {
-    return $resource(API.admin + '/labs/:labId', {}, {
-        query: {method: 'GET',
-                params: {labId: ''},
-                isArray: true}
-    });
-}])
-/** AdminResultsService @returns all scores and results */
-.factory('AdminResultsService', ['$resource', 'API',  function($resource, API) {
-    return $resource(API.admin + '/results', {}, {
-        query: {method: 'GET',
-                params: {},
-                isArray: false}
-    });
-}])
-/** AdminUsersService @returns all users */
-.factory('AdminUsersService', ['$resource', 'API',  function($resource, API) {
-    return $resource(API.admin + '/users', {}, {
-        query: {method: 'GET',
-                params: {},
-                isArray: true}
-    });
-}])
 
 /*****************************************************************************/
 /* User services */
-/** LabService @returns list of labs */
-.factory('LabService', ['$resource', 'API', function($resource, API) {
-    return $resource(API.user + '/labs/:labId', {}, {
-        query: {method: 'GET',
-                params: {labId: ''},
-                isArray: true}
-    });
-}])
 /** UserService @description deals with user authentication */
 .factory('UserService', ['$http', function($http) {
     var service = {
