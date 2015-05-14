@@ -18,7 +18,6 @@
         login: function (user) {
           return $http.post('/api/v1/login', user)
             .then(function (response) {
-              console.log('kaj');
               service.isLoggedIn = true;
               service.currentUser = response.data;
               return response;

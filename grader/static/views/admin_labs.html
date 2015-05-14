@@ -51,13 +51,16 @@
   <h2>
     <a href="#/admin/labs/{{lab.id}}">{{lab.name}}</a>
   </h2>
-  <p>{{lab.desc}}</p>
+  <p ng-show="!labCtrl.isEditLab(lab)">{{lab.desc}}</p>
+  <textarea class="edit-area" type="text" name="fname" ng-show="labCtrl.isEditLab(lab)"  cols="40" rows="5" ng-model="lab.desc"></textarea>
   <div class="row">
     <div class="col-md-12">
       Rok za predaju: <span ng-class="{'label label-danger': lab.isOver,
                                        'label label-success': !lab.isOver}">{{lab.end | date:'dd. MM. yyyy HH:mm:ss'}}</span>
       <span ng-show="lab.published" class="label label-success">Rezultati SU OBJAVLJENI studentima</span>
       <span ng-show="!lab.published" class="label label-danger">Rezultati NISU OBJAVLJENI studentima</span>
+      <button ng-click="labCtrl.editLab(lab)" class="btn btn-primary">
+        {{ labCtrl.editingData[lab.id].buttonText }}</button>
       
     </div>
   </div>
