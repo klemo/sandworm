@@ -37,7 +37,7 @@
       self.editingData[oneLab.id].isEditing = !self.editingData[oneLab.id].isEditing;
       self.editingData[oneLab.id].buttonText = self.editingData[oneLab.id].isEditing ? 'Spremi' : 'Uredi';
       if(!self.editingData[oneLab.id].isEditing) {
-        console.log('ok');
+        adminService.editLab(oneLab);
       }
 
     };

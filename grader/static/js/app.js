@@ -154,6 +154,7 @@ var sandworm = angular.module('sandworm', [
 
     /* set xsrf header */
     $http.defaults.headers['post']['X-XSRFToken'] = $cookies['_xsrf'];
+    $http.defaults.headers['put']['X-XSRFToken'] = $cookies['_xsrf'];
     $http.defaults.headers['delete'] = $http.defaults.headers['post'];
 
     $rootScope.$on('$stateChangeStart', function (event, next) {

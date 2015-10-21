@@ -103,6 +103,21 @@ def delete_admin_lab(db, lab_id):
     except Exception as e:
         raise 'delete failed'
 
+
+#------------------------------------------------------------------------------
+
+def edit_admin_lab(db, lab):
+    '''
+    Edit lab
+    '''
+    try:
+        del lab['_id']
+        db.labs.update({'id': lab['id']},lab , upsert=False, multi=False)
+        return True
+    except Exception as e:
+        LOGGER.error('error', exc_info=True)
+        return False
+
 #------------------------------------------------------------------------------
 # User API
 #------------------------------------------------------------------------------

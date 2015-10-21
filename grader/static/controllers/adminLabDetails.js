@@ -22,6 +22,10 @@
             }
         }
 
+        self.editLab = function () {
+
+        }
+
     }
 
 })();

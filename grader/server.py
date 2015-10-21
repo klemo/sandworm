@@ -52,7 +52,7 @@ class Application(tornado.web.Application):
             (r'/api/v1/labs/(.+)', LabHandler),
             # Admin API
             (r'/api/v1/admin/labs$', AdminLabHandler),
-            (r'/api/v1/admin/labs/(.+)', AdminLabHandler),
+          #  (r'/api/v1/admin/labs/(.+)', AdminLabHandler),
             (r'/api/v1/admin/results', AdminResultsHandler),
             (r'/api/v1/admin/users', AdminUsersHandler),
             #
@@ -147,6 +147,19 @@ class AdminLabHandler(BaseHandler):
             utils.jsonify(self, True)
         except Exception as e:
             LOGGER.error(e)
+            self.set_status(400)
+            utils.jsonify(self, {'code': 'delete-failed', 'err': ''})
+
+    @utils.auth('admin')
+    def put(self):
+        print 'Downloading File FooFile.txt [%d%%]\r'
+        putdata = json.loads(self.request.body)
+        print putdata
+        try:
+            db.edit_admin_lab(self.application.db, putdata)
+            utils.jsonify(self, True)
+        except Exception:
+            LOGGER.error('error', exc_info=True)
             self.set_status(400)
             utils.jsonify(self, {'code': 'delete-failed', 'err': ''})
 
